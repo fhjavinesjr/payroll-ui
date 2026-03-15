@@ -13,7 +13,7 @@ const menuItems = [
     id: 1,
     icon: "/personal_info.png",
     label: "Employment Record",
-    goto: "/hr-management/employmentrecord",
+    goto: "/payroll-management/employmentrecord",
     isActive: false,
   },
 
@@ -21,7 +21,7 @@ const menuItems = [
   id: 2,
   icon: "/LeaveApplication.png",
   label: "Leave Application",
-  goto: "/hr-management/hrSelfService/Leave-Application",
+  goto: "/payroll-management/hrSelfService/Leave-Application",
   isActive: false,
   },
 
@@ -29,7 +29,7 @@ const menuItems = [
     id: 3,
     icon: "/OvertimeRequest.png",
     label: "Overtime Request",
-    goto: "/hr-management/hrSelfService/Overtime-Request",
+    goto: "/payroll-management/hrSelfService/Overtime-Request",
     isActive: false,
   },
 
@@ -37,7 +37,7 @@ const menuItems = [
     id: 4,
     icon: "/CompensatoryTimeOff.png",
     label: "Compensatory Time Off",
-    goto: "/hr-management/hrSelfService/Compensatory-Time-Off",
+    goto: "/payroll-management/hrSelfService/Compensatory-Time-Off",
     isActive: false,
   },
 
@@ -45,7 +45,7 @@ const menuItems = [
     id: 5,
     icon: "/OfficialEngagement.png",
     label: "Official Engagement",
-    goto: "/hr-management/hrSelfService/Official-Engagement",
+    goto: "/payroll-management/hrSelfService/Official-Engagement",
     isActive: false,
   },
 
@@ -53,7 +53,7 @@ const menuItems = [
     id: 6,
     icon: "/PassSlip.png",
     label: "Pass Slip",
-    goto: "/hr-management/hrSelfService/Pass-Slip",
+    goto: "/payroll-management/hrSelfService/Pass-Slip",
     isActive: false,
   },
 
@@ -61,7 +61,7 @@ const menuItems = [
     id: 7,
     icon: "/TimeCorrection.png",
     label: "Time Correction",
-    goto: "/hr-management/hrSelfService/Time-Correction",
+    goto: "/payroll-management/hrSelfService/Time-Correction",
     isActive: false,
   }
 ];
@@ -71,14 +71,14 @@ const otherItems = [
     id: 2,
     icon: "/accounts.png",
     label: "Accounts",
-    goto: "/hr-management/accounts",
+    goto: "/payroll-management/accounts",
     isActive: false,
   },
   {
     id: 3,
     icon: "/help.png",
     label: "Help",
-    goto: "/hr-management",
+    goto: "/payroll-management",
     isActive: false,
   },
   {
@@ -96,8 +96,8 @@ export default function Sidebar() {
   return (
     <nav className={styles.Sidebar} role="navigation" aria-label="Main navigation">
       <div className={styles.brand}>
-        <div className={styles.brandIcon}>HRUI</div>
-        <div className={styles.brandName}>Human Resource Management UI</div>
+        <div className={styles.brandIcon}>PUI</div>
+        <div className={styles.brandName}>Payroll Management UI</div>
       </div>
 
       <div className={styles.menuSection}>
