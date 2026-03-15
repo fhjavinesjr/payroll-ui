@@ -12,8 +12,8 @@ export const AUTH_CONFIG = {
     "/administrative/registration",
     "/employee-portal/login",
     "/employee-portal/registration",
-    "/hr-management/login",
-    "/hr-management/registration",
+    "/payroll-management/login",
+    "/payroll-management/registration",
   ],
 
   INACTIVITY_LIMIT: 1000, // seconds

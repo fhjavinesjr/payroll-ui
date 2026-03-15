@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 After pulling the repository, please create the env file on your hr management UI file.
 Type in DATABASE_URL="sqlserver://localhost:1433;database=time_keeping;user=admin;password=sa;trustServerCertificate=true;encrypt=true;"
-        JWT_SECRET_KEY=hr-management-software-JWT_SECRET_KEY
+        JWT_SECRET_KEY=payroll-management-software-JWT_SECRET_KEY
 Create your database and login credentials on SQL Server.
 Database Name: time_keeping
 Login:
