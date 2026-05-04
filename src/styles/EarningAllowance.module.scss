@@ -1,0 +1,427 @@
+
+.EarningAllowance {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+
+    /* Wrap search + tabs together */
+    .stickyHeader {
+        position: sticky;
+        top: 0;          // space allowance
+        background: #fff;      // ⬅️ solid background to cover aperture
+        z-index: 10;
+        padding: 0.75rem 0;    // add vertical padding
+    }
+
+    .formGroup {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        width: 300px;
+        margin-bottom: 10px;
+
+        label {
+            font-size: 0.85rem;
+            margin-bottom: 0.7rem;
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+
+        input,
+        select {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .searchButton {
+            padding: 0.65rem 1.2rem;
+            background-color: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 80px;
+
+            &:hover {
+                background-color: #5a6268;
+            }
+        }
+    }
+
+    label {
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+        margin-top: 0.3rem;
+        font-weight: 600;
+    }
+
+    input, select {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+        
+    }
+
+    .percentage {
+      display: flex;
+      align-items: center;
+    }
+
+    .perc {
+      padding-left: 10px;
+      padding-right: 10px;
+      margin-bottom: 7px;
+    }
+
+    .amountFields {
+      width: 120px;
+    }
+
+    .txtArea {
+      width: 300px;
+    }
+
+    .buttonGroup {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+  .buttonGroup button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .buttonGroup button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+    .updateButton {
+      background: #fd7e14; 
+    }
+
+    .updateButton:hover {
+      background: #e8590c; 
+    }
+
+    .searchButton {
+     background: #6366f1; 
+    }
+
+    .searchButton:hover {
+      background: #4f46e5; 
+    }
+
+    .newButton {
+     background: #0070f3; 
+    }
+
+    .newButton:hover {
+      background: #0059c9; 
+    }
+
+    .saveButton { background: #28a745; }
+
+    .saveButton:hover { background: #218838; }
+
+    .clearButton {
+      padding: 0.65rem 1.2rem;
+      background-color: #f59e0b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      width: 80px;
+
+      &:hover {
+          background-color: #d97706;
+      }
+    }
+
+    /* Existing styles for tabs */
+    .tabsHeader {
+        display: flex;
+        border-bottom: 2px solid #ccc;
+        margin-top: 0.5rem;
+
+        button {
+            background: none;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+
+            &.active {
+            border-bottom: 3px solid #0056b3;
+            font-weight: bold;
+            color: #0056b3;
+            }
+        }
+    }
+
+    .tabContent {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .all {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .allWord {
+      font-weight: 600;
+      color: #5a6268;
+      font-size: 14px;
+      white-space: nowrap;
+      margin-bottom: 6px;
+    }
+
+    .allWord small {
+      font-weight: normal;
+    }
+    
+    .salaryPeriodContainer {
+      display: flex;
+    }
+
+    .salaryPeriodInput {
+      margin-right: 10px;
+    }
+
+    .note {
+      padding-left: 5px;
+      color: #5a6268;
+      padding-bottom: 7px;
+    }
+
+  .searchWrapper {
+      position: relative;
+      width: 320px;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      max-height: 180px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 6px;
+      z-index: 10;
+    }
+
+    .dropdownItem {
+      padding: 8px;
+      cursor: pointer;
+      font-size: 14px;
+
+      &:hover {
+        background-color: #f1f1f1;
+      }
+    }
+}
+
+.EarningsAndAllowanceTable {
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #f1f1f1;
+      font-weight: bold;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    td:nth-child(8) {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  }
+
+  .actions {
+    position: relative;
+    display: inline-block;
+  }
+
+  .actionButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    min-width: 160px; // ensure consistent width
+
+    button {
+      display: flex;              // ✅ make row layout
+      align-items: center;        // ✅ vertical center
+      gap: 8px;                   // ✅ spacing between icon + text
+      background: none;
+      border: none;
+      padding: 8px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      svg,
+      img,
+      span {
+        flex-shrink: 0; // keep icons from shrinking
+      }
+    }
+  }
+
+
+  .iconButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin: 0 6px;
+    transition: transform 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  .editIcon {
+    color: #0d6efd; // Bootstrap primary blue
+
+    &:hover {
+      color: #0a58ca; // darker blue on hover
+    }
+  }
+
+  .deleteIcon {
+    color: #dc3545; // Bootstrap danger red
+
+    &:hover {
+      color: #bb2d3b; // darker red on hover
+    }
+  }
+
+  .actionsCell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+}
+
+/* Search */
+.searchInput {
+  width: auto;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Excel Style Table */
+.excelTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.excelTable th,
+.excelTable td {
+  border: 1px solid #cfcfcf;
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.excelTable th {
+  background-color: #f3f3f3;
+  font-weight: 600;
+}
+
+.excelTable tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.optionBtn {
+  padding: 4px 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+
+.suggestionList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestionItem {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestionItem:hover {
+  background-color: #f2f2f2;
+}

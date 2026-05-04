@@ -63,6 +63,38 @@ const menuItems = [
     label: "Time Correction",
     goto: "/payroll-management/hrSelfService/Time-Correction",
     isActive: false,
+  },
+
+  {
+    id: 8,
+    icon: "/EarningAllowance.png",
+    label: "Earnings and Allowance",
+    goto: "/payroll-management/hrSelfService/EarningAllowance",
+    isActive: false,
+  },
+
+  {
+    id: 9,
+    icon: "/Deduction.png",
+    label: "Deduction",
+    goto: "/payroll-management/hrSelfService/Deduction",
+    isActive: false,
+  },
+
+  {
+    id: 10,
+    icon: "/Loan.png",
+    label: "Loan",
+    goto: "/payroll-management/hrSelfService/Loan",
+    isActive: false,
+  },
+
+  {
+    id: 11,
+    icon: "/Balance.png",
+    label: "Beginning Balance",
+    goto: "/payroll-management/hrSelfService/BeginningBalance",
+    isActive: false,
   }
 ];
 
