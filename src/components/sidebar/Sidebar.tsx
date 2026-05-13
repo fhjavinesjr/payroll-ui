@@ -11,62 +11,6 @@ import { useRouter } from "next/navigation";
 const menuItems = [
   {
     id: 1,
-    icon: "/personal_info.png",
-    label: "Employment Record",
-    goto: "/payroll-management/employmentrecord",
-    isActive: false,
-  },
-
-  {
-  id: 2,
-  icon: "/LeaveApplication.png",
-  label: "Leave Application",
-  goto: "/payroll-management/hrSelfService/Leave-Application",
-  isActive: false,
-  },
-
-  {
-    id: 3,
-    icon: "/OvertimeRequest.png",
-    label: "Overtime Request",
-    goto: "/payroll-management/hrSelfService/Overtime-Request",
-    isActive: false,
-  },
-
-  {
-    id: 4,
-    icon: "/CompensatoryTimeOff.png",
-    label: "Compensatory Time Off",
-    goto: "/payroll-management/hrSelfService/Compensatory-Time-Off",
-    isActive: false,
-  },
-
-  {
-    id: 5,
-    icon: "/OfficialEngagement.png",
-    label: "Official Engagement",
-    goto: "/payroll-management/hrSelfService/Official-Engagement",
-    isActive: false,
-  },
-
-  {
-    id: 6,
-    icon: "/PassSlip.png",
-    label: "Pass Slip",
-    goto: "/payroll-management/hrSelfService/Pass-Slip",
-    isActive: false,
-  },
-
-  {
-    id: 7,
-    icon: "/TimeCorrection.png",
-    label: "Time Correction",
-    goto: "/payroll-management/hrSelfService/Time-Correction",
-    isActive: false,
-  },
-
-  {
-    id: 8,
     icon: "/EarningAllowance.png",
     label: "Earnings and Allowance",
     goto: "/payroll-management/hrSelfService/EarningAllowance",
@@ -74,7 +18,7 @@ const menuItems = [
   },
 
   {
-    id: 9,
+    id: 2,
     icon: "/Deduction.png",
     label: "Deduction",
     goto: "/payroll-management/hrSelfService/Deduction",
@@ -82,7 +26,7 @@ const menuItems = [
   },
 
   {
-    id: 10,
+    id: 3,
     icon: "/Loan.png",
     label: "Loan",
     goto: "/payroll-management/hrSelfService/Loan",
@@ -90,7 +34,7 @@ const menuItems = [
   },
 
   {
-    id: 11,
+    id: 4,
     icon: "/Balance.png",
     label: "Beginning Balance",
     goto: "/payroll-management/hrSelfService/BeginningBalance",
