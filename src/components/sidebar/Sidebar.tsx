@@ -11,54 +11,44 @@ import { useRouter } from "next/navigation";
 const menuItems = [
   {
     id: 1,
+    icon: "/Balance.png",
+    label: "Beginning Balance",
+    goto: "/payroll-management/hrSelfService/BeginningBalance",
+    isActive: false,
+  },
+  {
+    id: 2,
     icon: "/EarningAllowance.png",
     label: "Earnings and Allowance",
     goto: "/payroll-management/hrSelfService/EarningAllowance",
     isActive: false,
   },
-
   {
-    id: 2,
+    id: 3,
     icon: "/Deduction.png",
     label: "Deduction",
     goto: "/payroll-management/hrSelfService/Deduction",
     isActive: false,
   },
-
   {
-    id: 3,
+    id: 4,
     icon: "/Loan.png",
     label: "Loan",
     goto: "/payroll-management/hrSelfService/Loan",
     isActive: false,
   },
-
-  {
-    id: 4,
-    icon: "/Balance.png",
-    label: "Beginning Balance",
-    goto: "/payroll-management/hrSelfService/BeginningBalance",
-    isActive: false,
-  }
 ];
 
 const otherItems = [
   {
     id: 2,
-    icon: "/accounts.png",
-    label: "Accounts",
-    goto: "/payroll-management/accounts",
-    isActive: false,
-  },
-  {
-    id: 3,
     icon: "/help.png",
     label: "Help",
     goto: "/payroll-management",
     isActive: false,
   },
   {
-    id: 4,
+    id: 3,
     icon: "/logout.png",
     label: "Logout",
     action: "logout",
