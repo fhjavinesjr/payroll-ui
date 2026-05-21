@@ -13,28 +13,28 @@ const menuItems = [
     id: 1,
     icon: "/Balance.png",
     label: "Beginning Balance",
-    goto: "/payroll-management/hrSelfService/BeginningBalance",
+    goto: "/payroll-management/BeginningBalance",
     isActive: false,
   },
   {
     id: 2,
     icon: "/EarningAllowance.png",
     label: "Earnings and Allowance",
-    goto: "/payroll-management/hrSelfService/EarningAllowance",
+    goto: "/payroll-management/EarningAllowance",
     isActive: false,
   },
   {
     id: 3,
     icon: "/Deduction.png",
     label: "Deduction",
-    goto: "/payroll-management/hrSelfService/Deduction",
+    goto: "/payroll-management/Deduction",
     isActive: false,
   },
   {
     id: 4,
     icon: "/Loan.png",
     label: "Loan",
-    goto: "/payroll-management/hrSelfService/Loan",
+    goto: "/payroll-management/Loan",
     isActive: false,
   },
 ];
@@ -67,7 +67,7 @@ export default function Sidebar() {
       </div>
 
       <div className={styles.menuSection}>
-        <h2 className={styles.menuHeader}>HR ACTION CENTER</h2>
+        <h2 className={styles.menuHeader}></h2>
         <div role="menu">
           {menuItems.map((item, index) => (
             <MenuItem key={index} icon={item.icon} label={item.label} goto={item.goto} isActive={pathname === item.goto} onClick={() => {}} />

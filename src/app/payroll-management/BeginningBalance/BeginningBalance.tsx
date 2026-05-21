@@ -624,7 +624,7 @@ export default function BeginningBalance() {
         <div className={modalStyles.Modal}>
             <div className={modalStyles.modalContent}>
                 <div className={modalStyles.modalHeader}>
-                    <h2 className={modalStyles.mainTitle}>HR Beginning Balance</h2>
+                    <h2 className={modalStyles.mainTitle}>Beginning Balance</h2>
                 </div>
                 <div className={modalStyles.modalBody}>
                     <form className={styles.BeginningForm} onSubmit={onSubmit}>
