@@ -1,0 +1,775 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  gap: 1.5rem;
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0 0 0.5rem;
+  }
+
+  // ── Shared section card ────────────────────────────────────────────────
+  .formSection,
+  .resultsSection {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    .periodTag {
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #e0e7ff;
+      color: #4338ca;
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+
+    .recordCount {
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+  }
+
+  // ── Period selector form ───────────────────────────────────────────────
+  .formRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 130px;
+  }
+
+  .label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .select {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: border-color 0.15s;
+
+    &:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .loadBtn {
+    padding: 0.48rem 1.4rem;
+    background: #4f46e5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    align-self: flex-end;
+
+    &:hover:not(:disabled) {
+      background: #4338ca;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .periodKeyNote {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  // ── Error / info banners ───────────────────────────────────────────────
+  .errorBanner {
+    background: #fff1f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 0.85rem 1.25rem;
+    color: #b91c1c;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .breakdownLoadingBanner {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    color: #1d4ed8;
+    font-size: 0.88rem;
+  }
+
+  // ── Totals summary bar ─────────────────────────────────────────────────
+  .totalsSummary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .totalItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-right: 1.5rem;
+    border-right: 1px solid #e2e8f0;
+
+    &:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+  }
+
+  .totalItemNet {
+    .totalValue {
+      color: #16a34a;
+      font-size: 1.05rem;
+    }
+  }
+
+  .totalLabel {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .totalValue {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  // ── Table toolbar ──────────────────────────────────────────────────────
+  .tableToolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .searchInput {
+    flex: 1;
+    min-width: 220px;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    background: #f8fafc;
+    color: #1e293b;
+
+    &:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+  }
+
+  .perPageControl {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #475569;
+  }
+
+  .rowSelect {
+    padding: 0.38rem 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #f8fafc;
+    cursor: pointer;
+  }
+
+  // ── Register table ─────────────────────────────────────────────────────
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
+  .registerTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+
+    th {
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 600;
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    tbody tr {
+      transition: background 0.1s;
+
+      &:hover {
+        background: #f8fafc;
+      }
+    }
+
+    .tdIdx {
+      color: #94a3b8;
+      width: 2.5rem;
+      text-align: center;
+    }
+
+    .tdCode {
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: #475569;
+    }
+
+    .tdName {
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .tdCenter {
+      text-align: center;
+    }
+
+    .tdAmt {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .tdAmtNet {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: #15803d;
+      white-space: nowrap;
+    }
+
+    .lastPageRow {
+      background: #fefce8;
+
+      &:hover {
+        background: #fef9c3;
+      }
+    }
+
+    .lastPageBadge {
+      margin-left: 0.4rem;
+      color: #ca8a04;
+      font-size: 0.75rem;
+    }
+
+    .statusBadge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+
+    .viewBtn {
+      background: none;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+
+      &:hover:not(:disabled) {
+        background: #e0e7ff;
+        border-color: #6366f1;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    .emptyRow {
+      text-align: center;
+      color: #94a3b8;
+      padding: 2rem;
+    }
+  }
+
+  // ── Pagination ─────────────────────────────────────────────────────────
+  .paginationControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #475569;
+  }
+
+  .recordInfo {
+    color: #64748b;
+  }
+
+  .pageButtons {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .pageBtn {
+    padding: 4px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #334155;
+    transition: background 0.12s;
+
+    &:hover:not(:disabled) {
+      background: #e0e7ff;
+      border-color: #6366f1;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .pageIndicator {
+    padding: 0 0.5rem;
+    font-size: 0.85rem;
+    color: #475569;
+    white-space: nowrap;
+  }
+}
+
+// ── Modal Overlay ──────────────────────────────────────────────────────────
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modalContent {
+  width: min(900px, 95vw);
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.modalHeaderContent {
+  flex: 1;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.3rem;
+}
+
+.modalHeaderSubtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0.05rem 0;
+}
+
+.modalHeaderBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.badgeLocked {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 4px;
+  padding: 3px 10px;
+}
+
+.badgeFlag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #fef9c3;
+  color: #854d0e;
+  border-radius: 4px;
+  padding: 3px 10px;
+}
+
+.modalCloseBtn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #64748b;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+  line-height: 1;
+
+  &:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #cbd5e1;
+  }
+}
+
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ── Breakdown Detail Section ────────────────────────────────────────────────
+
+.breakdownDetailContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.breakdownDetailHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 0.5rem;
+}
+
+.breakdownDetailTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.2rem;
+}
+
+.breakdownDetailSubtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0.05rem 0;
+}
+
+.breakdownDetailBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.backBtn {
+  padding: 0.45rem 1rem;
+  background: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #a5b4fc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    background: #c7d2fe;
+  }
+}
+
+// ── Breakdown sections ─────────────────────────────────────────────────────
+
+.breakdownSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.breakdownSectionTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+// ── Attendance grid ────────────────────────────────────────────────────────
+
+.attendanceGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.attendanceStat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 110px;
+}
+
+.attendanceLabel {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.attendanceValue {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.negative {
+  color: #dc2626;
+}
+
+.absentParticulars {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+  padding: 0.5rem 0.75rem;
+  background: #fff7ed;
+  border-left: 3px solid #fb923c;
+  border-radius: 0 4px 4px 0;
+}
+
+// ── Breakdown tables ───────────────────────────────────────────────────────
+
+.breakdownTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+
+  th {
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.48rem 0.7rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+  }
+
+  tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  tfoot {
+    .totalRow {
+      font-weight: 700;
+      color: #1e293b;
+      background: #f8fafc;
+
+      td {
+        border-top: 2px solid #e2e8f0;
+        padding-top: 0.55rem;
+      }
+    }
+  }
+
+  .tdIdx {
+    color: #94a3b8;
+    text-align: center;
+    width: 2rem;
+  }
+
+  .tdCode {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  .tdRef {
+    font-size: 0.82rem;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .amtCol {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .taxYes {
+    font-size: 0.74rem;
+    font-weight: 600;
+    background: #dcfce7;
+    color: #166534;
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  .taxNo {
+    font-size: 0.74rem;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  .loanMeta {
+    font-size: 0.76rem;
+    color: #7c3aed;
+  }
+}
+
+.emptyNote {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0.25rem 0;
+}
+
+// ── Financial summary ──────────────────────────────────────────────────────
+
+.summaryGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 400px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #334155;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  span:first-child {
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  span:last-child {
+    font-weight: 600;
+    color: #1e293b;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.netPayRow {
+  margin-top: 0.35rem;
+  border-top: 2px solid #e2e8f0;
+  padding-top: 0.5rem;
+
+  span:last-child {
+    font-size: 1.05rem;
+    color: #15803d;
+  }
+}

@@ -50,6 +50,7 @@ type SalaryPeriodOption = {
     cutoffEndMonthOffset: number;
     salaryReleaseStartDay: number | null;
     salaryReleaseEndDay: number | null;
+    salaryReleaseMonthOffset: number | null;
     isActive: boolean;
 };
 
@@ -80,7 +81,8 @@ function ordinal(n: number): string {
 function monthOffsetLabel(offset: number): string {
     if (offset === 0) return "Current Mo.";
     if (offset === -1) return "Prev Mo.";
-    return `${Math.abs(offset)} Mo. Ago`;
+    if (offset === 1) return "Next Mo.";
+    return offset > 0 ? `+${offset} Mo.` : `${Math.abs(offset)} Mo. Ago`;
 }
 
 function formatSalaryType(raw: string): string {
@@ -93,10 +95,10 @@ function periodLabel(p: SalaryPeriodOption): string {
     let release = "";
     if (p.salaryReleaseStartDay != null && p.salaryReleaseEndDay != null) {
         release = p.salaryReleaseStartDay === p.salaryReleaseEndDay
-            ? `  |  Release: Day ${p.salaryReleaseStartDay}`
-            : `  |  Release: Day ${p.salaryReleaseStartDay}-${p.salaryReleaseEndDay}`;
+            ? `  |  Release: Day ${p.salaryReleaseStartDay} (${monthOffsetLabel(p.salaryReleaseMonthOffset ?? 0)})`
+            : `  |  Release: Day ${p.salaryReleaseStartDay}-${p.salaryReleaseEndDay} (${monthOffsetLabel(p.salaryReleaseMonthOffset ?? 0)})`;
     } else if (p.salaryReleaseStartDay != null) {
-        release = `  |  Release: Day ${p.salaryReleaseStartDay}`;
+        release = `  |  Release: Day ${p.salaryReleaseStartDay} (${monthOffsetLabel(p.salaryReleaseMonthOffset ?? 0)})`;
     }
     return `${formatSalaryType(p.salaryType)} - ${ordinal(p.nthOrder)} Period  |  Cutoff: ${start} - ${end}${release}`;
 }

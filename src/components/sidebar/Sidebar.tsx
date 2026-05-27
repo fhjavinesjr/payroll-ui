@@ -6,6 +6,7 @@ import styles from "@/styles/Sidebar.module.scss";
 import { usePathname } from 'next/navigation';
 import { authLogout } from "@/lib/utils/authLogout";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 
 const menuItems = [
@@ -35,6 +36,20 @@ const menuItems = [
     icon: "/Loan.png",
     label: "Loan",
     goto: "/payroll-management/Loan",
+    isActive: false,
+  },
+  {
+    id: 5,
+    icon: "/dashboard.png",
+    label: "Payroll Computation",
+    goto: "/payroll-management/PayrollComputation",
+    isActive: false,
+  },
+  {
+    id: 6,
+    icon: "/dashboard.png",
+    label: "Payroll Register",
+    goto: "/payroll-management/PayrollRegister",
     isActive: false,
   },
 ];
@@ -84,8 +99,21 @@ export default function Sidebar() {
               icon={item.icon}
               label={item.label}
               isActive={pathname === item.goto}
-              onClick={() => {
+              onClick={async () => {
                 if (item.action === "logout") {
+                  const activeJob = sessionStorage.getItem("payroll_active_job");
+                  if (activeJob) {
+                    const result = await Swal.fire({
+                      icon: "warning",
+                      title: "Payroll Computation In Progress",
+                      html: "A payroll computation job is currently running.<br/>Logging out will stop the live monitoring view, but <strong>the computation will continue on the server</strong>.<br/><br/>Are you sure you want to log out?",
+                      showCancelButton: true,
+                      confirmButtonText: "Yes, log out",
+                      cancelButtonText: "Stay",
+                      confirmButtonColor: "#d97706",
+                    });
+                    if (!result.isConfirmed) return;
+                  }
                   authLogout();
                   router.replace("/time-keeping/login");
                 } else if (item.goto) {
