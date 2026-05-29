@@ -170,6 +170,7 @@ export default function PayrollComputation() {
     const [phase, setPhase] = useState<Phase>("idle");
     const [jobId, setJobId] = useState<string | null>(null);
     const [salaryPeriodKey, setSalaryPeriodKey] = useState<string | null>(null);
+    const [lockAfterCompute, setLockAfterCompute] = useState(false);
     const [jobStatus, setJobStatus] = useState<JobStatus | null>(null);
     const [results, setResults] = useState<PayrollDetail[]>([]);
     const [loadingResults, setLoadingResults] = useState(false);
@@ -189,6 +190,7 @@ export default function PayrollComputation() {
 
     // Employee pre-setup (before computation)
     const [employeeConfigs, setEmployeeConfigs] = useState<EmployeeConfig[]>([]);
+    const [selectedEmployeeNos, setSelectedEmployeeNos] = useState<Set<string>>(new Set());
     const [loadingConfigs, setLoadingConfigs] = useState(false);
     const [configSaved, setConfigSaved] = useState(false);
     const [configPage, setConfigPage] = useState(1);
@@ -360,6 +362,14 @@ export default function PayrollComputation() {
         return () => { stopPolling(); stopQueuePolling(); };
     }, [stopPolling, stopQueuePolling]);
 
+    // ── Persist last-run data so PayrollRegister can show correct status ────
+    useEffect(() => {
+        if (phase !== "done" || !salaryPeriodKey || queueItems.length === 0) return;
+        const computedNos = queueItems.filter(q => q.status === "OK").map(q => q.employeeNo);
+        const failedNos   = queueItems.filter(q => q.status === "FAILED").map(q => q.employeeNo);
+        sessionStorage.setItem("payroll_last_run", JSON.stringify({ periodKey: salaryPeriodKey, computedNos, failedNos }));
+    }, [phase, queueItems, salaryPeriodKey]);
+
     // ── Restore in-progress job after navigation ───────────────────────────
     useEffect(() => {
         const saved = sessionStorage.getItem("payroll_active_job");
@@ -445,6 +455,8 @@ export default function PayrollComputation() {
             if (!res.ok) throw new Error(`Failed to load employee list (${res.status})`);
             const data: EmployeeConfig[] = await res.json();
             setEmployeeConfigs(data);
+            // Default: all employees selected for computation
+            setSelectedEmployeeNos(new Set(data.map(c => c.employeeNo)));
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : "Failed to load employee list";
             Swal.mixin({ toast: true, position: "bottom-end", showConfirmButton: false, timer: 3000 })
@@ -511,6 +523,24 @@ export default function PayrollComputation() {
     const resultsStartIndex = (resultsPage - 1) * resultsPerPage;
     const paginatedResults = filteredResults.slice(resultsStartIndex, resultsStartIndex + resultsPerPage);
 
+    // Build a map from employeeNo → queue status for the current job.
+    // If queueItems is empty (e.g. restored session), the map is empty and we fall back to DB status.
+    const queueStatusMap: Map<string, "OK" | "FAILED"> =
+        queueItems.length > 0
+            ? new Map(queueItems.map(qi => [qi.employeeNo, qi.status]))
+            : new Map();
+
+    function getResultStatus(employeeNo: string, dbStatus: string): { label: string; cssKey: string } {
+        if (queueStatusMap.size === 0) {
+            // No queue data (restored session) — show raw DB status
+            return { label: dbStatus, cssKey: dbStatus };
+        }
+        const qs = queueStatusMap.get(employeeNo);
+        if (qs === "OK")     return { label: "COMPUTED",     cssKey: "COMPUTED" };
+        if (qs === "FAILED") return { label: "FAILED",       cssKey: "FAILED" };
+        return                      { label: "NOT COMPUTED", cssKey: "NOT_COMPUTED" };
+    }
+
     const filteredConfigs = configSearch.trim()
         ? employeeConfigs.filter(c =>
             c.employeeNo.toLowerCase().includes(configSearch.toLowerCase()) ||
@@ -548,12 +578,39 @@ export default function PayrollComputation() {
                 ? "Regular Employees"
                 : "Contractual Employees (COS / JO)";
 
+        if (lockAfterCompute) {
+            try {
+                const pendingRes = await fetchWithAuth(
+                    `${API_PAYROLL}/api/payroll-adjustment/pending-count/${encodeURIComponent(periodKey)}`
+                );
+                const pendingCount = pendingRes.ok ? Number(await pendingRes.json()) : 0;
+                if (pendingCount > 0) {
+                    await Swal.fire({
+                        icon: "warning",
+                        title: "Pending Adjustments Found",
+                        html: `There ${pendingCount === 1 ? "is" : "are"} <strong>${pendingCount}</strong> PENDING adjustment${pendingCount === 1 ? "" : "s"} for this period.<br/><br/>Post them first before running with <strong>Lock after compute</strong>.`,
+                        confirmButtonText: "OK",
+                    });
+                    return;
+                }
+            } catch {
+                await Swal.fire({
+                    icon: "warning",
+                    title: "Adjustment Check Failed",
+                    text: "Could not verify pending adjustments. Please try again.",
+                });
+                return;
+            }
+        }
+
         const confirm = await Swal.fire({
             icon: "question",
             title: "Run Payroll Computation?",
             html: `Compute payroll for <strong>${groupLabel}</strong><br/>
                    Period: <strong>${month} ${ordinal(parseInt(period))} ${year}</strong><br/>
-                   Cutoff: <strong>${derivedDates!.cutoffStartDate} \u2013 ${derivedDates!.cutoffEndDate}</strong><br/><br/>
+                   Cutoff: <strong>${derivedDates!.cutoffStartDate} \u2013 ${derivedDates!.cutoffEndDate}</strong><br/>
+                   Employees: <strong>${selectedEmployeeNos.size > 0 ? selectedEmployeeNos.size : employeeConfigs.length}</strong> selected<br/>
+                   Lock after compute: <strong>${lockAfterCompute ? "YES" : "NO"}</strong><br/><br/>
                    Existing records for this period will be overwritten.`,
             showCancelButton: true,
             confirmButtonText: "Yes, compute it!",
@@ -578,7 +635,12 @@ export default function PayrollComputation() {
                         cutoffDays: 22,
                         includeExcluded: employeeMode === "contractual",
                         excludedOnly: employeeMode === "contractual",
-                        lockAfterCompute: false,
+                        lockAfterCompute,
+                        selectedEmployeeNos:
+                            selectedEmployeeNos.size > 0 &&
+                            selectedEmployeeNos.size < employeeConfigs.length
+                                ? Array.from(selectedEmployeeNos)
+                                : null,
                     }),
                 }
             );
@@ -620,6 +682,7 @@ export default function PayrollComputation() {
         stopPolling();
         stopQueuePolling();
         sessionStorage.removeItem("payroll_active_job");
+        sessionStorage.removeItem("payroll_last_run");
         setPhase("idle");
         setJobId(null);
         setSalaryPeriodKey(null);
@@ -839,6 +902,19 @@ export default function PayrollComputation() {
                         <p className={styles.waitMsg}>No employees found for this period and group.</p>
                     ) : (
                         <>
+                            <div className={styles.selectionSummary}>
+                                <span>
+                                    <strong>{selectedEmployeeNos.size}</strong> of <strong>{employeeConfigs.length}</strong> employee{employeeConfigs.length !== 1 ? "s" : ""} selected for this computation run
+                                </span>
+                                {selectedEmployeeNos.size < employeeConfigs.length && (
+                                    <button
+                                        className={styles.selectAllBtn}
+                                        onClick={() => setSelectedEmployeeNos(new Set(employeeConfigs.map(c => c.employeeNo)))}
+                                    >
+                                        Select All
+                                    </button>
+                                )}
+                            </div>
                             <div className={styles.tableToolbar}>
                                 <input
                                     type="text"
@@ -866,6 +942,23 @@ export default function PayrollComputation() {
                                 <table className={styles.table}>
                                     <thead>
                                         <tr>
+                                            <th style={{ textAlign: "center", width: "2.5rem" }}>
+                                                <input
+                                                    type="checkbox"
+                                                    title="Select / deselect all employees"
+                                                    checked={
+                                                        employeeConfigs.length > 0 &&
+                                                        employeeConfigs.every(c => selectedEmployeeNos.has(c.employeeNo))
+                                                    }
+                                                    onChange={e => {
+                                                        if (e.target.checked) {
+                                                            setSelectedEmployeeNos(new Set(employeeConfigs.map(c => c.employeeNo)));
+                                                        } else {
+                                                            setSelectedEmployeeNos(new Set());
+                                                        }
+                                                    }}
+                                                />
+                                            </th>
                                             <th>#</th>
                                             <th>Employee No</th>
                                             <th>Name</th>
@@ -878,7 +971,25 @@ export default function PayrollComputation() {
                                     </thead>
                                     <tbody>
                                         {paginatedConfigs.map((cfg, idx) => (
-                                            <tr key={cfg.employeeNo} className={cfg.isExcludedFromPayroll ? styles.rowExcluded : undefined}>
+                                            <tr key={cfg.employeeNo} className={[
+                                                cfg.isExcludedFromPayroll ? styles.rowExcluded : "",
+                                                !selectedEmployeeNos.has(cfg.employeeNo) ? styles.rowDeselected : "",
+                                            ].filter(Boolean).join(" ")}>
+                                                <td style={{ textAlign: "center" }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        title="Include in this computation run"
+                                                        checked={selectedEmployeeNos.has(cfg.employeeNo)}
+                                                        onChange={e => {
+                                                            setSelectedEmployeeNos(prev => {
+                                                                const next = new Set(prev);
+                                                                if (e.target.checked) next.add(cfg.employeeNo);
+                                                                else next.delete(cfg.employeeNo);
+                                                                return next;
+                                                            });
+                                                        }}
+                                                    />
+                                                </td>
                                                 <td>{configStartIndex + idx + 1}</td>
                                                 <td>{cfg.employeeNo}</td>
                                                 <td>{cfg.employeeName}</td>
@@ -923,6 +1034,16 @@ export default function PayrollComputation() {
                                 >
                                     Save Setup
                                 </button>
+
+                                <label style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", fontSize: "0.84rem", color: "#334155" }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={lockAfterCompute}
+                                        onChange={(e) => setLockAfterCompute(e.target.checked)}
+                                        disabled={submitting}
+                                    />
+                                    Lock after compute
+                                </label>
 
                                 <button
                                     className={styles.computeBtn}
@@ -1156,8 +1277,8 @@ export default function PayrollComputation() {
                                                 {formatMoney(row.netAmount)}
                                             </td>
                                             <td>
-                                                <span className={`${styles.rowStatus} ${styles[`rowStatus_${row.status}`]}`}>
-                                                    {row.status}
+                                                <span className={`${styles.rowStatus} ${styles[`rowStatus_${getResultStatus(row.employeeNo, row.status).cssKey}`]}`}>
+                                                    {getResultStatus(row.employeeNo, row.status).label}
                                                 </span>
                                             </td>
                                         </tr>

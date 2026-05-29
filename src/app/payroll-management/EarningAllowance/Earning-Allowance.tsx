@@ -305,9 +305,9 @@ export default function EarningAllowance() {
             setIsEffective(true);
         }
 
-        const matched = earningTypes.find(e => e.name === item.allowanceType);
+        const matched = earningTypes.find(e => String(e.earningTypeId) === item.allowanceType || e.name === item.allowanceType);
         setCategory(matched ? (matched.allowance ? "Allowance" : "Earnings") : "");
-        setType(item.allowanceType);
+        setType(matched ? String(matched.earningTypeId) : item.allowanceType);
         setAmount_per_period(formatWithCommas(String(item.amountPerSalary)));
         setAmount_daily(formatWithCommas(String(item.amountDaily)));
         setPercentage(String(item.percentage));
@@ -433,7 +433,7 @@ export default function EarningAllowance() {
                                 disabled={!category}>
                                 <option value="">{category ? "Select Type" : "Select a category first"}</option>
                                 {filteredTypes.map(t => (
-                                    <option key={t.earningTypeId} value={t.name}>{t.name}</option>
+                                    <option key={t.earningTypeId} value={String(t.earningTypeId)}>{t.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -513,7 +513,7 @@ export default function EarningAllowance() {
                                 </thead>
                                 <tbody>
                                     {paginatedArr.map((m) => {
-                                        const matched = earningTypes.find(e => e.name === m.allowanceType);
+                                        const matched = earningTypes.find(e => String(e.earningTypeId) === m.allowanceType || e.name === m.allowanceType);
                                         const cat = matched ? (matched.allowance ? "Allowance" : "Earnings") : "";
                                         return (
                                         <tr key={m.id}>
@@ -522,7 +522,7 @@ export default function EarningAllowance() {
                                             <td>{formatPeriodDisplay(m.salaryPeriod)}</td>
                                             <td>{formatPeriodDisplay(m.effectiveUntil)}</td>
                                             <td>{cat}</td>
-                                            <td>{m.allowanceType}</td>
+                                            <td>{matched?.name ?? m.allowanceType}</td>
                                             <td>{formatAmount(m.amountPerSalary)}</td>
                                             <td>{formatAmount(m.amountDaily)}</td>
                                             <td>

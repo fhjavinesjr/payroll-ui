@@ -92,6 +92,14 @@ function formatAmount(val: number): string {
 }
 
 function formatSalaryPeriod(sp: string): string {
+    // Key format: "2026-6-1"
+    const keyParts = sp.split("-");
+    if (keyParts.length === 3 && keyParts[0].length === 4) {
+        const mon = months[parseInt(keyParts[1]) - 1];
+        const nth = parseInt(keyParts[2]);
+        if (mon && !isNaN(nth)) return `${ordinal(nth)} Period \u00B7 ${mon} ${keyParts[0]}`;
+    }
+    // Legacy display format: "June 1 2026"
     const parts = sp.split(" ");
     if (parts.length < 3) return sp;
     const [mon, nthStr, yr] = parts;
@@ -191,11 +199,15 @@ export default function Deduction() {
 
     useEffect(() => { setCurrentPage(1); }, [tableSearch, itemsPerPage]);
 
+    const resolveDeductionTypeName = (raw: string) =>
+        deductionTypes.find(t => String(t.deductionTypeId) === raw || t.name === raw)?.name ?? raw;
+
     const filteredArr = arr.filter((m) => {
         const q = tableSearch.toLowerCase();
+        const typeName = resolveDeductionTypeName(m.deductionType).toLowerCase();
         return m.employeeNo.toLowerCase().includes(q) ||
             m.employeeName.toLowerCase().includes(q) ||
-            m.deductionType.toLowerCase().includes(q);
+            typeName.includes(q);
     });
     const totalPages = Math.ceil(filteredArr.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -215,7 +227,7 @@ export default function Deduction() {
     const buildPayload = (): DeductionEntry => ({
         employeeNo: selectedEmployee?.employeeNo ?? "",
         employeeName: selectedEmployee?.fullName ?? "",
-        salaryPeriod: `${month} ${period} ${year}`,
+        salaryPeriod: `${year}-${months.indexOf(month) + 1}-${period}`,
         deductionType: type,
         referenceNo,
         amount: parseFloat(amount.replace(/,/g, "")) || 0,
@@ -266,8 +278,16 @@ export default function Deduction() {
         setEditItem(item);
         setSearch(`${item.employeeNo} - ${item.employeeName}`);
         setSelectedEmployee({ employeeNo: item.employeeNo, fullName: item.employeeName });
-        const sp = item.salaryPeriod.split(" ");
-        setMonth(sp[0] || ""); setPeriod(sp[1] || ""); setYear(sp[2] || currentYear);
+        // Support both key format "2026-6-1" and legacy display format "June 1 2026"
+        const keyParts = item.salaryPeriod.split("-");
+        if (keyParts.length === 3 && keyParts[0].length === 4) {
+            setYear(keyParts[0] || currentYear);
+            setMonth(months[parseInt(keyParts[1]) - 1] || "");
+            setPeriod(keyParts[2] || "");
+        } else {
+            const sp = item.salaryPeriod.split(" ");
+            setMonth(sp[0] || ""); setPeriod(sp[1] || ""); setYear(sp[2] || currentYear);
+        }
         setIsFixed(item.isFixed ?? false);
         setType(item.deductionType);
         setReferenceNo(item.referenceNo || "");
@@ -363,7 +383,7 @@ export default function Deduction() {
                             <select value={type} onChange={(e) => setType(e.target.value)} className={styles.salaryPeriodInput}>
                                 <option value="">Select Deduction Type</option>
                                 {deductionTypes.map(t => (
-                                    <option key={t.deductionTypeId} value={t.name}>{t.name}</option>
+                                    <option key={t.deductionTypeId} value={String(t.deductionTypeId)}>{t.name}</option>
                                 ))}
                             </select>
 
@@ -442,7 +462,7 @@ export default function Deduction() {
                                             <td>{m.employeeNo}</td>
                                             <td>{m.employeeName}</td>
                                             <td>{formatSalaryPeriod(m.salaryPeriod)}</td>
-                                            <td>{m.deductionType}</td>
+                                            <td>{resolveDeductionTypeName(m.deductionType)}</td>
                                             <td>{m.referenceNo}</td>
                                             <td>{formatAmount(m.amount)}</td>
                                             <td>{m.isFixed ? "Yes" : "No"}</td>
