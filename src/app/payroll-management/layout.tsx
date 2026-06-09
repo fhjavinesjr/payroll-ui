@@ -6,7 +6,7 @@ import PageAuthentication from "./PageAuthentication";
 import LayoutClientWrapper from "./layoutClientWrapper";
 
 export const metadata: Metadata = {
-  title: "Payroll Management",
+  title: "Payroll",
   description: "Powered by NextJS",
 };
 

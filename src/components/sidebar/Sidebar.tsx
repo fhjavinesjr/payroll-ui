@@ -10,13 +10,13 @@ import Swal from "sweetalert2";
 
 
 const menuItems = [
-  {
-    id: 1,
-    icon: "/Balance.png",
-    label: "Beginning Balance",
-    goto: "/payroll-management/BeginningBalance",
-    isActive: false,
-  },
+  // {
+  //   id: 1,
+  //   icon: "/Balance.png",
+  //   label: "Beginning Balance",
+  //   goto: "/payroll-management/BeginningBalance",
+  //   isActive: false,
+  // },
   {
     id: 2,
     icon: "/EarningAllowance.png",
@@ -78,7 +78,7 @@ export default function Sidebar() {
     <nav className={styles.Sidebar} role="navigation" aria-label="Main navigation">
       <div className={styles.brand}>
         <div className={styles.brandIcon}>PUI</div>
-        <div className={styles.brandName}>Payroll Management UI</div>
+        <div className={styles.brandName}>Payroll UI</div>
       </div>
 
       <div className={styles.menuSection}>

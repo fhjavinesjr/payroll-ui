@@ -48,4 +48,21 @@ export const localStorageUtil = {
     return parsed[key] ?? null;
   },
   clearSystemConfig: () => localStorage.removeItem("systemConfig"),
+
+  setIsAdministrator: (val: boolean) => localStorage.setItem("isAdministrator", val ? "true" : "false"),
+  getIsAdministrator: () => localStorage.getItem("isAdministrator") === "true",
+
+  // Permission data — full module permission map from the matched ruleset
+  // null means super admin (all access). An empty object means no access to anything.
+  setPermissionData: (data: Record<string, { canAccess: boolean }> | null) =>
+    localStorage.setItem("permissionData", data === null ? "__superadmin__" : JSON.stringify(data)),
+  getPermissionData: (): Record<string, { canAccess: boolean }> | null => {
+    const raw = localStorage.getItem("permissionData");
+    if (!raw || raw === "__superadmin__") return null; // null = full access
+    try { return JSON.parse(raw); } catch { return null; }
+  },
+
+  setPermissionName: (name: string) => localStorage.setItem("permissionName", name),
+  getPermissionName: () => localStorage.getItem("permissionName"),
+  clearPermissionName: () => localStorage.removeItem("permissionName"),
 };

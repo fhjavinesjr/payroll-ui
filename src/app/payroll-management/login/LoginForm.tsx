@@ -81,24 +81,60 @@ export default function LoginPage() {
       const currentEmp = employees.find(emp => emp.employeeNo === employeeNo);
 
       if (currentEmp) {
-        if (currentEmp.role !== "1") {
-          // Clear session — non-admin users are not allowed here
-          Object.values(AUTH_CONFIG.COOKIE).forEach((key) => {
-            document.cookie = `${key}=; Max-Age=0; path=/`;
-          });
-          localStorage.clear();
-          Swal.fire({
-            title: "Access Denied",
-            text: "This portal is for administrators only.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-          return;
-        }
         localStorageUtil.setBiometricNo(currentEmp.biometricNo); // Store biometricNo
         localStorageUtil.setEmployeeNo(currentEmp.employeeNo); // Store employeeNo
         localStorageUtil.setEmployeeFullname(currentEmp.fullName); // Store fullname
         localStorageUtil.setEmployeeRole(currentEmp.role);
+
+        // Super admin (employeeNo === "admin") always has full access — not subject to permission rulesets
+        if (currentEmp.employeeNo === "admin") {
+          localStorageUtil.setIsAdministrator(true);
+          localStorageUtil.setPermissionData(null); // null = superadmin, full access
+        } else {
+          // Resolve permission ruleset — store isAdministrator flag AND full permissionData
+          try {
+            const permRes = await fetchWithAuth(`${API_BASE_URL_ADMINISTRATIVE}/api/permission/get-all`);
+            if (permRes.ok) {
+              const rulesets: Array<{ permissionId: number; permissionName: string; isAdministrator: boolean; permissionData: string }> = await permRes.json();
+              const matched = rulesets.find(r => String(r.permissionId) === currentEmp.role);
+              if (matched) {
+                localStorageUtil.setIsAdministrator(matched.isAdministrator);
+                localStorageUtil.setPermissionName(matched.permissionName ?? "");
+                try {
+                  const parsed = JSON.parse(matched.permissionData ?? "{}");
+                  localStorageUtil.setPermissionData(parsed);
+
+                  if (matched.permissionName === "USER") {
+                    // Clear session — non-admin users are not allowed here
+                    Object.values(AUTH_CONFIG.COOKIE).forEach((key) => {
+                      document.cookie = `${key}=; Max-Age=0; path=/`;
+                    });
+                    localStorage.clear();
+                    Swal.fire({
+                      title: "Access Denied",
+                      text: "This portal is for administrators only.",
+                      icon: "error",
+                      confirmButtonText: "OK",
+                    });
+                    return;
+                  }
+                } catch {
+                  localStorageUtil.setPermissionData({});
+                }
+              } else {
+                localStorageUtil.setIsAdministrator(false);
+                localStorageUtil.setPermissionData({});
+              }
+            } else {
+              localStorageUtil.setIsAdministrator(false);
+              localStorageUtil.setPermissionData({});
+            }
+          } catch (e) {
+            console.warn("Could not load permission rulesets:", e);
+            localStorageUtil.setIsAdministrator(false);
+            localStorageUtil.setPermissionData({});
+          }
+        }
       }
 
       // Fetch and store system configuration from backend
@@ -146,17 +182,17 @@ export default function LoginPage() {
             src="/IT_logo.png"
             width={500}
             height={500}
-            alt="Payroll Management Portal"
+            alt="Payroll"
           />
         </div>
         <div className={styles.borderLeft}></div>
         <div className={styles.inputs}>
           <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid #e8e8e8" }}>
-            <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1a3c6e", margin: 0, marginBottom: 4 }}>Bayanihan GovSuite</h1>
-            <p style={{ fontSize: 12, color: "#6b7280", margin: 0 }}>Empowering Public Sector Workforce Management</p>
+            <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1a3c6e", margin: 0, marginBottom: 4 }}>ISOFT HRIS</h1>
+            <p style={{ fontSize: 12, color: "#6b7280", margin: 0 }}>Empowering Public Service Through Digital Workforce Solutions</p>
           </div>
           <div className={styles.header}>
-            <h2>Payroll Management</h2>
+            <h2>Payroll</h2>
           </div>
           <InputFieldSetup
             name="employeeNo"
