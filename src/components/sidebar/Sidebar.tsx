@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { authLogout } from "@/lib/utils/authLogout";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import { localStorageUtil } from "@/lib/utils/localStorageUtil";
 
 
 const menuItems = [
@@ -23,6 +24,7 @@ const menuItems = [
     label: "Earnings and Allowance",
     goto: "/payroll-management/EarningAllowance",
     isActive: false,
+    permKey: "payroll.earningAllowance",
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ const menuItems = [
     label: "Deduction",
     goto: "/payroll-management/Deduction",
     isActive: false,
+    permKey: "payroll.deduction",
   },
   {
     id: 4,
@@ -37,6 +40,7 @@ const menuItems = [
     label: "Loan",
     goto: "/payroll-management/Loan",
     isActive: false,
+    permKey: "payroll.loan",
   },
   {
     id: 5,
@@ -44,6 +48,7 @@ const menuItems = [
     label: "Payroll Computation",
     goto: "/payroll-management/PayrollComputation",
     isActive: false,
+    permKey: "payroll.computation",
   },
   {
     id: 6,
@@ -51,6 +56,7 @@ const menuItems = [
     label: "Payroll Register",
     goto: "/payroll-management/PayrollRegister",
     isActive: false,
+    permKey: "payroll.register",
   },
 ];
 
@@ -74,6 +80,8 @@ export default function Sidebar() {
   const pathname = usePathname(); // Use usePathname for the current route
   const router = useRouter();    // Use useRouter for navigation
 
+  const visibleMenuItems = menuItems.filter(item => localStorageUtil.canAccess(item.permKey));
+
   return (
     <nav className={styles.Sidebar} role="navigation" aria-label="Main navigation">
       <div className={styles.brand}>
@@ -84,7 +92,7 @@ export default function Sidebar() {
       <div className={styles.menuSection}>
         <h2 className={styles.menuHeader}></h2>
         <div role="menu">
-          {menuItems.map((item, index) => (
+          {visibleMenuItems.map((item, index) => (
             <MenuItem key={index} icon={item.icon} label={item.label} goto={item.goto} isActive={pathname === item.goto} onClick={() => {}} />
           ))}
         </div>

@@ -8,6 +8,7 @@ import modalStyles from "@/styles/Modal.module.scss";
 import { FaRegEdit, FaTrashAlt } from "react-icons/fa";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
 import { localStorageUtil } from "@/lib/utils/localStorageUtil";
+import { Employee } from "@/lib/types/Employee";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -139,6 +140,10 @@ export default function Deduction() {
     const [deductionTypes, setDeductionTypes] = useState<DeductionTypeOption[]>([]);
     const [editItem, setEditItem] = useState<DeductionEntry | null>(null);
 
+    const canAdd = localStorageUtil.canAdd("payroll.deduction");
+    const canEdit = localStorageUtil.canEdit("payroll.deduction");
+    const canDelete = localStorageUtil.canDelete("payroll.deduction");
+
     const toast = (icon: "success" | "error", title: string) =>
         Swal.mixin({
             toast: true,
@@ -198,6 +203,29 @@ export default function Deduction() {
     }, [loadEmployees, loadData, loadSalaryPeriods, loadDeductionTypes]);
 
     useEffect(() => { setCurrentPage(1); }, [tableSearch, itemsPerPage]);
+
+    // Load employees from localStorage on mount
+    useEffect(() => {
+        const stored = localStorageUtil.getEmployees();
+        if (stored && stored.length > 0) {
+        setEmployees(stored);
+        }
+        const role = localStorageUtil.getEmployeeRole();
+        const fullname = localStorageUtil.getEmployeeFullname();
+        const empNo = localStorageUtil.getEmployeeNo();
+        const employeeId = localStorageUtil.getEmployeeId();
+        if (empNo && ((!canAdd && !canEdit) || (canAdd && !canEdit) || (!canAdd && canEdit))) {
+        const empFromList = stored?.find(e => e.employeeNo === empNo) ?? null;
+        if (empFromList) {
+            setSelectedEmployee(empFromList);
+            setSearch(`[${empFromList.employeeNo}] ${empFromList.fullName}`);
+        } else if (fullname) {
+            const own: Employee = { employeeId: String(employeeId ?? ""), employeeNo: empNo, fullName: fullname, role: role ?? "", biometricNo: "", isSearched: false, isCleared: false };
+            setSelectedEmployee(own);
+            setSearch(`[${empNo}] ${fullname}`);
+        }
+        }
+    }, []);
 
     const resolveDeductionTypeName = (raw: string) =>
         deductionTypes.find(t => String(t.deductionTypeId) === raw || t.name === raw)?.name ?? raw;
@@ -324,33 +352,41 @@ export default function Deduction() {
                 <div className={modalStyles.modalBody}>
                     <div className={styles.Deduction}>
                         <div className={styles.formGroup} style={{ position: "relative" }}>
-                            <label>Employee</label>
+                            <label>Employee Name</label>
                             <div style={{ position: "relative" }}>
                                 <input
+                                    id="deduction-employee"
                                     type="text"
-                                    placeholder="Employee No / Name"
+                                    list={"deduction-employee-list"}
+                                    placeholder="Employee No / Last Name"
                                     value={search}
-                                    onChange={(e) => { setSearch(e.target.value); setSelectedEmployee(null); }}
+                                    readOnly={(!canAdd && !canEdit) || (canAdd && !canEdit) || (!canAdd && canEdit)}
+                                    onChange={(e) => {
+                                    if ((!canAdd && !canEdit) || (canAdd && !canEdit) || (!canAdd && canEdit)) return;
+                                    setSearch(e.target.value);
+                                    const match = employees.find(
+                                        (emp) =>
+                                        `[${emp.employeeNo}] ${emp.fullName}`.toLowerCase() ===
+                                        e.target.value.toLowerCase()
+                                    );
+                                    if (match) {
+                                        setSelectedEmployee(match);
+                                    } else {
+                                        setSelectedEmployee(null);
+                                    }
+                                    }}
                                     className={styles.searchInput}
+                                    style={{ width: "100%" }}
                                 />
-                                {search && !selectedEmployee && (
-                                    <div className={styles.dropdown}>
-                                        {employees
-                                            .filter(emp =>
-                                                `${emp.employeeNo} ${emp.fullName}`.toLowerCase().includes(search.toLowerCase())
-                                            )
-                                            .map(emp => (
-                                                <div
-                                                    key={emp.employeeNo}
-                                                    className={styles.dropdownItem}
-                                                    onClick={() => {
-                                                        setSelectedEmployee(emp);
-                                                        setSearch(`${emp.employeeNo} - ${emp.fullName}`);
-                                                    }}>
-                                                    {emp.employeeNo} - {emp.fullName}
-                                                </div>
-                                            ))}
-                                    </div>
+                                {(
+                                    <datalist id="deduction-employee-list">
+                                    {employees.map((emp) => (
+                                        <option
+                                        key={emp.employeeNo}
+                                        value={`[${emp.employeeNo}] ${emp.fullName}`}
+                                        />
+                                    ))}
+                                    </datalist>
                                 )}
                             </div>
 
@@ -406,11 +442,14 @@ export default function Deduction() {
                         </div>
 
                         <div className={styles.buttonGroup}>
-                            <button
-                                className={editItem ? styles.updateButton : mode === "save" ? styles.saveButton : styles.newButton}
-                                onClick={() => { if (mode === "search") { setMode("save"); } else { handleSubmit(); } }}>
-                                {editItem ? "Update" : mode === "save" ? "Save" : "New"}
-                            </button>
+                            {(
+                                canAdd &&
+                                <button
+                                    className={editItem ? styles.updateButton : mode === "save" ? styles.saveButton : styles.newButton}
+                                    onClick={() => { if (mode === "search") { setMode("save"); } else { handleSubmit(); } }}>
+                                    {editItem ? "Update" : mode === "save" ? "Save" : "New"}
+                                </button>
+                            )}
                             {mode === "save" && (
                                 <button type="button" className={styles.clearButton} onClick={() => { setMode("search"); clear(); }}>
                                     Cancel
@@ -467,12 +506,16 @@ export default function Deduction() {
                                             <td>{formatAmount(m.amount)}</td>
                                             <td>{m.isFixed ? "Yes" : "No"}</td>
                                             <td>
-                                                <button className={`${styles.iconButton} ${styles.editIcon}`} onClick={() => handleEdit(m)} title="Edit">
-                                                    <FaRegEdit />
-                                                </button>
-                                                <button className={`${styles.iconButton} ${styles.deleteIcon}`} onClick={() => handleDelete(m)} title="Delete">
-                                                    <FaTrashAlt />
-                                                </button>
+                                                {( canEdit &&
+                                                    <button className={`${styles.iconButton} ${styles.editIcon}`} onClick={() => handleEdit(m)} title="Edit">
+                                                        <FaRegEdit />
+                                                    </button>
+                                                )}
+                                                {( canDelete &&
+                                                    <button className={`${styles.iconButton} ${styles.deleteIcon}`} onClick={() => handleDelete(m)} title="Delete">
+                                                        <FaTrashAlt />
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
