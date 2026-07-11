@@ -1,0 +1,400 @@
+.filterCard {
+  border: 1px solid #d7e2f2;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #f8fbff;
+  margin-bottom: 1rem;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0 0 0.25rem;
+    color: #123b7a;
+  }
+
+  p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+  }
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.3fr) minmax(110px, 0.45fr) minmax(150px, 0.65fr) minmax(320px, 1.25fr) minmax(220px, 0.8fr);
+  gap: 0.85rem;
+  align-items: end;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  input,
+  select {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.9rem;
+    outline: none;
+    background: #ffffff;
+  }
+
+  select:disabled {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+  }
+
+  input:focus,
+  select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14);
+  }
+}
+
+.periodGroup {
+  min-width: 320px;
+}
+
+.periodKeyNote {
+  margin: 0.7rem 0 0;
+  font-size: 0.8rem;
+  color: #475569;
+
+  strong {
+    color: #1e3a8a;
+  }
+}
+
+.checkGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: #334155;
+  padding-bottom: 0.55rem;
+
+  input {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  button {
+    border: none;
+    border-radius: 6px;
+    background: #334155;
+    color: #ffffff;
+    padding: 0.55rem 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .secondaryButton {
+    background: #64748b;
+  }
+}
+
+.printArea {
+  overflow-x: auto;
+}
+
+.payslipPaper {
+  background: #ffffff;
+  border: 1px solid #d7dce5;
+  border-radius: 10px;
+  padding: 1.1rem;
+  color: #0f172a;
+}
+
+.payslipHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 2px solid #1e3a8a;
+  padding-bottom: 0.8rem;
+  margin-bottom: 0.85rem;
+
+  .kicker {
+    margin: 0 0 0.15rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 800;
+  }
+
+  h1 {
+    margin: 0;
+    color: #0f2f6b;
+    font-size: 1.55rem;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: #475569;
+    font-size: 0.88rem;
+  }
+}
+
+.statusBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+
+  span {
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-weight: 800;
+    font-size: 0.76rem;
+  }
+
+  small {
+    color: #475569;
+  }
+}
+
+.locked {
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+}
+
+.draft {
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+}
+
+.employeeGrid,
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+
+  div {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.65rem;
+    background: #f8fafc;
+  }
+
+  span {
+    display: block;
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 800;
+  }
+
+  strong {
+    font-size: 0.92rem;
+    color: #0f172a;
+  }
+}
+
+.summaryGrid {
+  grid-template-columns: repeat(6, minmax(130px, 1fr));
+
+  .netCard {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+
+    strong {
+      color: #1d4ed8;
+      font-size: 1rem;
+    }
+  }
+}
+
+.tableGrid,
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.tableCard,
+.detailCard {
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+
+  h3 {
+    margin: 0;
+    padding: 0.65rem 0.8rem;
+    background: #eef2ff;
+    color: #17367a;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #dbe3ef;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: #f8fafc;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: #475569;
+  }
+
+  tfoot td {
+    font-weight: 800;
+    background: #f8fafc;
+  }
+}
+
+.amount {
+  text-align: right !important;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.emptyCell {
+  text-align: center !important;
+  color: #64748b;
+  font-style: italic;
+}
+
+.autoBadge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.detailRows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem 0.75rem;
+  padding: 0.75rem;
+
+  span {
+    color: #475569;
+    font-size: 0.82rem;
+  }
+
+  strong {
+    text-align: right;
+    font-size: 0.84rem;
+  }
+}
+
+.note {
+  margin: 0.2rem 0.75rem 0.75rem;
+  padding: 0.55rem;
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 0.8rem;
+}
+
+.footerSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+
+  div {
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0.75rem;
+    background: #eff6ff;
+  }
+
+  span {
+    display: block;
+    color: #475569;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+  }
+
+  strong {
+    color: #1d4ed8;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 1100px) {
+  .filterGrid,
+  .employeeGrid,
+  .summaryGrid,
+  .tableGrid,
+  .detailGrid,
+  .footerSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .statusBox {
+    align-items: flex-start;
+  }
+
+  .payslipHeader {
+    flex-direction: column;
+  }
+}
+
+@media print {
+  .filterCard,
+  .actions {
+    display: none !important;
+  }
+
+  .payslipPaper {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .printArea {
+    overflow: visible;
+  }
+}

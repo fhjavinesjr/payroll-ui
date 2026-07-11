@@ -58,6 +58,14 @@ const menuItems = [
     isActive: false,
     permKey: "payroll.register",
   },
+  {
+    id: 7,
+    icon: "/dashboard.png",
+    label: "Payslip",
+    goto: "/payroll-management/Payslip",
+    isActive: false,
+    permKey: "payroll.payslip",
+  },
 ];
 
 const otherItems = [
