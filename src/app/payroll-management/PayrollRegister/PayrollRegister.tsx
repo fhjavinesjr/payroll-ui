@@ -1594,6 +1594,32 @@ export default function PayrollRegister() {
         }
     }, [salaryPeriodKey]);
 
+    const handleGenerateGeneralPayroll = async () => {
+        if (!salaryPeriodKey) {
+            alert("Please select month, period, and year first.");
+            return;
+        }
+
+        try {
+            const url =
+                `${API_PAYROLL}/api/payroll-general-report/pdf?salaryPeriodKey=${encodeURIComponent(salaryPeriodKey)}`;
+
+            const res = await fetchWithAuth(url);
+
+            if (!res.ok) {
+                throw new Error(`Failed to generate report. Status: ${res.status}`);
+            }
+
+            const blob = await res.blob();
+            const pdfUrl = window.URL.createObjectURL(blob);
+
+            window.open(pdfUrl, "_blank");
+        } catch (err) {
+            console.error(err);
+            alert("Failed to generate General Payroll report.");
+        }
+    };
+
     // ── Load breakdown ────────────────────────────────────────────────────
 
     const handleViewBreakdown = useCallback(async (employeeNo: string) => {
@@ -1928,6 +1954,14 @@ export default function PayrollRegister() {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
+                        <button
+                            type="button"
+                            className={styles.loadBtn}
+                            onClick={handleGenerateGeneralPayroll}
+                            disabled={!salaryPeriodKey || rows.length === 0}
+                        >
+                            General Payroll
+                        </button>
                         <div className={styles.perPageControl}>
                             <label>Rows:</label>
                             <select
