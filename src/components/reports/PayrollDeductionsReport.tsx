@@ -24,13 +24,10 @@ type SalaryPeriodOption = {
     isActive?: boolean;
 };
 
-type EarningTypeOption = {
-    earningTypeId: number;
+type DeductionTypeOption = {
+    deductionTypeId: number;
     accountingCode?: string | null;
     name: string;
-    taxable?: boolean | null;
-    allowance: boolean;
-    hazardPay?: boolean | null;
 };
 
 type EmployeeOption = {
@@ -75,15 +72,14 @@ function parseEmployeeInput(value: string): { employeeNo: string; fullName: stri
     return { employeeNo: "", fullName: value.trim() };
 }
 
-export default function PayrollEarningsReport() {
+export default function PayrollDeductionsReport() {
     const currentYear = String(new Date().getFullYear());
     const [month, setMonth] = useState("");
     const [period, setPeriod] = useState("");
     const [year, setYear] = useState(currentYear);
-    const [category, setCategory] = useState<"" | "Earnings" | "Allowance">("");
-    const [type, setType] = useState("");
+    const [deductionTypeId, setDeductionTypeId] = useState("");
     const [salaryPeriods, setSalaryPeriods] = useState<SalaryPeriodOption[]>([]);
-    const [earningTypes, setEarningTypes] = useState<EarningTypeOption[]>([]);
+    const [deductionTypes, setDeductionTypes] = useState<DeductionTypeOption[]>([]);
     const [employees, setEmployees] = useState<EmployeeOption[]>([]);
     const [preparedBy, setPreparedBy] = useState("");
     const [certifiedBy, setCertifiedBy] = useState("");
@@ -100,13 +96,10 @@ export default function PayrollEarningsReport() {
         return `${ordinal(Number(period))} Period · ${month} ${year}`;
     }, [month, period, year]);
 
-    const filteredTypes = useMemo(() => (
-        earningTypes.filter(e => category === "Allowance" ? e.allowance === true : e.allowance !== true)
-    ), [earningTypes, category]);
-
-    const selectedType = useMemo(() => (
-        earningTypes.find(e => String(e.earningTypeId) === type) ?? null
-    ), [earningTypes, type]);
+    const selectedDeductionType = useMemo(
+        () => deductionTypes.find((item) => String(item.deductionTypeId) === deductionTypeId) ?? null,
+        [deductionTypes, deductionTypeId]
+    );
 
     const loadSalaryPeriods = useCallback(async () => {
         try {
@@ -119,27 +112,27 @@ export default function PayrollEarningsReport() {
         }
     }, []);
 
-    const loadEarningTypes = useCallback(async () => {
+    const loadDeductionTypes = useCallback(async () => {
         try {
-            const res = await fetchWithAuth(`${API_ADMINISTRATIVE}/api/earningType/get-all`);
+            const res = await fetchWithAuth(`${API_ADMINISTRATIVE}/api/deductionType/get-all`);
             if (!res.ok) throw new Error();
-            const data: EarningTypeOption[] = await res.json();
-            setEarningTypes([...data].sort((a, b) => a.name.localeCompare(b.name)));
+            const data: DeductionTypeOption[] = await res.json();
+            setDeductionTypes([...data].sort((a, b) => a.name.localeCompare(b.name)));
         } catch {
-            Swal.fire("Error", "Failed to load earning types.", "error");
+            Swal.fire("Error", "Failed to load deduction types.", "error");
         }
     }, []);
 
     useEffect(() => {
         loadSalaryPeriods();
-        loadEarningTypes();
+        loadDeductionTypes();
         const stored = localStorageUtil.getEmployees();
         setEmployees(stored.map(e => ({ employeeNo: e.employeeNo, fullName: e.fullName })));
-    }, [loadSalaryPeriods, loadEarningTypes]);
+    }, [loadSalaryPeriods, loadDeductionTypes]);
 
     const handleGenerate = async () => {
-        if (!salaryPeriodKey || !category || !selectedType) {
-            Swal.fire("Missing filters", "Please select salary period, category, and type first.", "warning");
+        if (!salaryPeriodKey || !selectedDeductionType) {
+            Swal.fire("Missing filters", "Please select salary period and deduction type first.", "warning");
             return;
         }
 
@@ -156,11 +149,9 @@ export default function PayrollEarningsReport() {
         try {
             const params = new URLSearchParams({
                 salaryPeriodKey,
-                category,
-                earningTypeId: String(selectedType.earningTypeId),
-                earningTypeName: selectedType.name,
-                earningTypeCode: selectedType.accountingCode ?? selectedType.name,
-                hazardPay: String(Boolean(selectedType.hazardPay || selectedType.name.toLowerCase().includes("hazard"))),
+                deductionTypeId: String(selectedDeductionType.deductionTypeId),
+                deductionTypeName: selectedDeductionType.name,
+                deductionTypeCode: selectedDeductionType.accountingCode ?? selectedDeductionType.name,
                 currentCompany: "ISOFT HRIS",
                 reportPeriodLabel,
                 preparedBy: prepared.fullName,
@@ -171,22 +162,22 @@ export default function PayrollEarningsReport() {
                 approvedByEmployeeNo: approved.employeeNo,
             });
 
-            const res = await fetchWithAuth(`${API_PAYROLL}/api/payroll-reports/earnings/pdf?${params.toString()}`);
+            const res = await fetchWithAuth(`${API_PAYROLL}/api/payroll-reports/deductions/pdf?${params.toString()}`);
             if (!res.ok) throw new Error(`Server returned ${res.status}`);
 
             const blob = await res.blob();
             const pdfUrl = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
-            const safeType = selectedType.name.replace(/[^a-zA-Z0-9_-]/g, "_");
+            const safeType = selectedDeductionType.name.replace(/[^a-zA-Z0-9_-]/g, "_");
             a.href = pdfUrl;
-            a.download = `${safeType}_Report_${salaryPeriodKey}.pdf`;
+            a.download = `${safeType}_Deduction_Report_${salaryPeriodKey}.pdf`;
             document.body.appendChild(a);
             a.click();
             a.remove();
             window.URL.revokeObjectURL(pdfUrl);
         } catch (err) {
             console.error(err);
-            Swal.fire("Error", "Failed to generate earnings report.", "error");
+            Swal.fire("Error", "Failed to generate deductions report.", "error");
         } finally {
             setGenerating(false);
         }
@@ -196,7 +187,7 @@ export default function PayrollEarningsReport() {
         <div className={modalStyles.Modal}>
             <div className={modalStyles.modalContent}>
                 <div className={modalStyles.modalHeader}>
-                    <h2 className={modalStyles.mainTitle}>Reports — Earnings</h2>
+                    <h2 className={modalStyles.mainTitle}>Reports — Deductions</h2>
                 </div>
                 <div className={modalStyles.modalBody}>
                     <div className={styles.EarningAllowance}>
@@ -218,32 +209,21 @@ export default function PayrollEarningsReport() {
                                 <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} className={styles.salaryPeriodInput} />
                             </div>
 
-                            <label>Category</label>
+                            <label>Deduction Type</label>
                             <select
-                                value={category}
-                                onChange={(e) => { setCategory(e.target.value as "" | "Earnings" | "Allowance"); setType(""); }}
+                                value={deductionTypeId}
+                                onChange={(e) => setDeductionTypeId(e.target.value)}
                                 className={styles.salaryPeriodInput}>
-                                <option value="">Select Category</option>
-                                <option value="Earnings">Earnings</option>
-                                <option value="Allowance">Allowance</option>
-                            </select>
-
-                            <label>Type</label>
-                            <select
-                                value={type}
-                                onChange={(e) => setType(e.target.value)}
-                                className={styles.salaryPeriodInput}
-                                disabled={!category}>
-                                <option value="">{category ? "Select Type" : "Select a category first"}</option>
-                                {filteredTypes.map(t => (
-                                    <option key={t.earningTypeId} value={String(t.earningTypeId)}>{t.name}</option>
+                                <option value="">Select Deduction Type</option>
+                                {deductionTypes.map(t => (
+                                    <option key={t.deductionTypeId} value={String(t.deductionTypeId)}>{t.name}</option>
                                 ))}
                             </select>
 
                             <label>Prepared By</label>
                             <input
                                 type="text"
-                                list="earning-report-employees"
+                                list="deduction-report-employees"
                                 value={preparedBy}
                                 onChange={(e) => setPreparedBy(e.target.value)}
                                 placeholder="Select employee or type name"
@@ -253,7 +233,7 @@ export default function PayrollEarningsReport() {
                             <label>Certified Correct</label>
                             <input
                                 type="text"
-                                list="earning-report-employees"
+                                list="deduction-report-employees"
                                 value={certifiedBy}
                                 onChange={(e) => setCertifiedBy(e.target.value)}
                                 placeholder="Select employee or type name"
@@ -263,14 +243,14 @@ export default function PayrollEarningsReport() {
                             <label>Approved By</label>
                             <input
                                 type="text"
-                                list="earning-report-employees"
+                                list="deduction-report-employees"
                                 value={approvedBy}
                                 onChange={(e) => setApprovedBy(e.target.value)}
                                 placeholder="Select employee or type name"
                                 className={styles.salaryPeriodInput}
                             />
 
-                            <datalist id="earning-report-employees">
+                            <datalist id="deduction-report-employees">
                                 {employees.map((emp) => (
                                     <option key={emp.employeeNo} value={`[${emp.employeeNo}] ${emp.fullName}`} />
                                 ))}

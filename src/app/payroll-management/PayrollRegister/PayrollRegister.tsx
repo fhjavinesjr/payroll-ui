@@ -5,6 +5,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import styles from "@/styles/PayrollRegister.module.scss";
 import modalStyles from "@/styles/Modal.module.scss";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
+import { localStorageUtil } from "@/lib/utils/localStorageUtil";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -28,6 +29,14 @@ type SalaryPeriodOption = {
     salaryReleaseMonthOffset: number | null;
     isActive: boolean;
 };
+
+type EmployeeOption = {
+    employeeId?: string | number;
+    employeeNo: string;
+    fullName: string;
+    position?: string;
+};
+
 
 type PayrollDetailRow = {
     id: number;
@@ -1467,6 +1476,14 @@ export default function PayrollRegister() {
     const [periodLock, setPeriodLock] = useState<PeriodLockInfo>({ locked: false });
     const [lockingPeriod, setLockingPeriod] = useState(false);
 
+    // ── General Payroll signatory modal ──────────────────────────────────
+    const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+    const [showGeneralPayrollModal, setShowGeneralPayrollModal] = useState(false);
+    const [generatingGeneralPayroll, setGeneratingGeneralPayroll] = useState(false);
+    const [preparedBy, setPreparedBy] = useState("");
+    const [approvedBy, setApprovedBy] = useState("");
+    const [cashierBy, setCashierBy] = useState("");
+
     useEffect(() => {
         const saved = sessionStorage.getItem("payroll_last_run");
         if (!saved) return;
@@ -1486,6 +1503,33 @@ export default function PayrollRegister() {
             .then((data: SalaryPeriodOption[]) => setSalaryPeriods(data))
             .catch(() => setSalaryPeriods([]));
     }, []);
+
+    useEffect(() => {
+        try {
+            const storedEmployees = localStorageUtil.getEmployees();
+            setEmployees(
+                storedEmployees
+                    .filter((employee) => employee.employeeNo && employee.fullName)
+                    .map((employee) => {
+                        const record = employee as unknown as {
+                            employeeId?: string | number;
+                            employeeNo: string;
+                            fullName: string;
+                            position?: string;
+                        };
+                        return {
+                            employeeId: record.employeeId,
+                            employeeNo: record.employeeNo,
+                            fullName: record.fullName,
+                            position: record.position ?? "",
+                        };
+                    })
+            );
+        } catch {
+            setEmployees([]);
+        }
+    }, []);
+
 
     // ── Derived values ────────────────────────────────────────────────────
 
@@ -1594,31 +1638,106 @@ export default function PayrollRegister() {
         }
     }, [salaryPeriodKey]);
 
-    const handleGenerateGeneralPayroll = async () => {
-        if (!salaryPeriodKey) {
-            alert("Please select month, period, and year first.");
+    const employeeInputLabel = useCallback((employee: EmployeeOption) => (
+        `[${employee.employeeNo}] ${employee.fullName}`
+    ), []);
+
+    const findSignatoryEmployee = useCallback((value: string) => {
+        const clean = value.trim().toLowerCase();
+        if (!clean) return null;
+
+        const exactMatch = employees.find((employee) => employeeInputLabel(employee).toLowerCase() === clean);
+        if (exactMatch) return exactMatch;
+
+        const bracketMatch = value.trim().match(/^\[([^\]]+)\]\s*(.+)$/);
+        if (bracketMatch?.[1]) {
+            const employeeNo = bracketMatch[1].trim().toLowerCase();
+            return employees.find((employee) => employee.employeeNo.toLowerCase() === employeeNo) ?? null;
+        }
+
+        return employees.find((employee) => employee.fullName.toLowerCase() === clean) ?? null;
+    }, [employeeInputLabel, employees]);
+
+    const resolveSignatoryName = useCallback((value: string) => {
+        const clean = value.trim();
+        if (!clean) return "";
+
+        const matchedEmployee = findSignatoryEmployee(clean);
+        if (matchedEmployee) return matchedEmployee.fullName;
+
+        const bracketMatch = clean.match(/^\[([^\]]+)\]\s*(.+)$/);
+        if (bracketMatch?.[2]) return bracketMatch[2].trim();
+
+        return clean;
+    }, [findSignatoryEmployee]);
+
+    const resolveSignatoryEmployeeNo = useCallback((value: string) => {
+        const matchedEmployee = findSignatoryEmployee(value);
+        return matchedEmployee?.employeeNo ?? "";
+    }, [findSignatoryEmployee]);
+
+    const handleSignatoryChange = useCallback((
+        value: string,
+        setName: React.Dispatch<React.SetStateAction<string>>
+    ) => {
+        setName(value);
+    }, []);
+
+    const handleOpenGeneralPayrollModal = useCallback(() => {
+        if (!loadedKey) return;
+        setPreparedBy((prev) => prev || localStorageUtil.getEmployeeFullname() || "");
+        setApprovedBy((prev) => prev || "");
+        setCashierBy((prev) => prev || "");
+        setShowGeneralPayrollModal(true);
+    }, [loadedKey]);
+
+    const handleGenerateGeneralPayroll = useCallback(async () => {
+        if (!loadedKey) return;
+
+        const finalPreparedBy = resolveSignatoryName(preparedBy);
+        const finalApprovedBy = resolveSignatoryName(approvedBy);
+        const finalCashierBy = resolveSignatoryName(cashierBy);
+        const finalPreparedByEmployeeNo = resolveSignatoryEmployeeNo(preparedBy);
+        const finalApprovedByEmployeeNo = resolveSignatoryEmployeeNo(approvedBy);
+        const finalCashierByEmployeeNo = resolveSignatoryEmployeeNo(cashierBy);
+
+        if (!finalPreparedBy || !finalApprovedBy || !finalCashierBy) {
+            alert("Please select or enter Prepared By, Approved By, and Cashier before generating the General Payroll report.");
             return;
         }
 
+        setGeneratingGeneralPayroll(true);
         try {
-            const url =
-                `${API_PAYROLL}/api/payroll-general-report/pdf?salaryPeriodKey=${encodeURIComponent(salaryPeriodKey)}`;
+            const params = new URLSearchParams({
+                salaryPeriodKey: loadedKey,
+                currentCompany: "ISOFT HRIS",
+                preparedBy: finalPreparedBy,
+                approvedBy: finalApprovedBy,
+                cashierBy: finalCashierBy,
+                preparedByEmployeeNo: finalPreparedByEmployeeNo,
+                approvedByEmployeeNo: finalApprovedByEmployeeNo,
+                cashierByEmployeeNo: finalCashierByEmployeeNo,
+            });
 
-            const res = await fetchWithAuth(url);
-
+            const res = await fetchWithAuth(`${API_PAYROLL}/api/payroll-general-report/pdf?${params.toString()}`);
             if (!res.ok) {
-                throw new Error(`Failed to generate report. Status: ${res.status}`);
+                const message = await res.text();
+                throw new Error(message || `Server returned ${res.status}`);
             }
 
             const blob = await res.blob();
             const pdfUrl = window.URL.createObjectURL(blob);
+            window.open(pdfUrl, "_blank", "noopener,noreferrer");
+            setShowGeneralPayrollModal(false);
 
-            window.open(pdfUrl, "_blank");
+            window.setTimeout(() => window.URL.revokeObjectURL(pdfUrl), 60_000);
         } catch (err) {
-            console.error(err);
-            alert("Failed to generate General Payroll report.");
+            const message = err instanceof Error ? err.message : "Failed to generate General Payroll report.";
+            alert(message);
+        } finally {
+            setGeneratingGeneralPayroll(false);
         }
-    };
+    }, [approvedBy, cashierBy, loadedKey, preparedBy, resolveSignatoryEmployeeNo, resolveSignatoryName]);
 
     // ── Load breakdown ────────────────────────────────────────────────────
 
@@ -1955,12 +2074,12 @@ export default function PayrollRegister() {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                         <button
-                            type="button"
                             className={styles.loadBtn}
-                            onClick={handleGenerateGeneralPayroll}
-                            disabled={!salaryPeriodKey || rows.length === 0}
+                            onClick={handleOpenGeneralPayrollModal}
+                            disabled={!loadedKey}
+                            title="Generate the A3 General Payroll PDF for the loaded salary period"
                         >
-                            General Payroll
+                            🖨 General Payroll
                         </button>
                         <div className={styles.perPageControl}>
                             <label>Rows:</label>
@@ -2113,6 +2232,95 @@ export default function PayrollRegister() {
                                 onClick={() => setPage(totalPages)}
                                 disabled={safePage === totalPages}
                             >»</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* General Payroll Signatory Modal */}
+            {showGeneralPayrollModal && (
+                <div
+                    className={styles.adjModalOverlay}
+                    onClick={() => !generatingGeneralPayroll && setShowGeneralPayrollModal(false)}
+                >
+                    <div className={styles.adjModalContent} onClick={(e) => e.stopPropagation()} style={{ maxWidth: 560 }}>
+                        <div className={styles.adjModalHeader}>
+                            <div>
+                                <p className={styles.adjModalTitle}>Generate General Payroll</p>
+                                <p className={styles.adjModalSubtitle}>Period: {loadedKey}</p>
+                            </div>
+                            <button
+                                className={styles.adjModalCloseBtn}
+                                onClick={() => setShowGeneralPayrollModal(false)}
+                                disabled={generatingGeneralPayroll}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className={styles.adjModalBody}>
+                            <p style={{ margin: "0 0 0.75rem", color: "#475569", fontSize: "0.85rem" }}>
+                                Select or type the officers who will appear in the signature section of the General Payroll Register.
+                            </p>
+
+                            <datalist id="general-payroll-employee-list">
+                                {employees.map((employee) => (
+                                    <option key={employee.employeeNo} value={employeeInputLabel(employee)} />
+                                ))}
+                            </datalist>
+
+                            <div className={styles.adjHeaderFields} style={{ gridTemplateColumns: "1fr" }}>
+                                <div>
+                                    <label className={styles.adjFormLabel}>Prepared By *</label>
+                                    <input
+                                        className={styles.adjFormInput}
+                                        list="general-payroll-employee-list"
+                                        value={preparedBy}
+                                        onChange={(e) => handleSignatoryChange(e.target.value, setPreparedBy)}
+                                        placeholder="Select employee or type name"
+                                        disabled={generatingGeneralPayroll}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={styles.adjFormLabel}>Approved By *</label>
+                                    <input
+                                        className={styles.adjFormInput}
+                                        list="general-payroll-employee-list"
+                                        value={approvedBy}
+                                        onChange={(e) => handleSignatoryChange(e.target.value, setApprovedBy)}
+                                        placeholder="Select employee or type name"
+                                        disabled={generatingGeneralPayroll}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={styles.adjFormLabel}>Cashier *</label>
+                                    <input
+                                        className={styles.adjFormInput}
+                                        list="general-payroll-employee-list"
+                                        value={cashierBy}
+                                        onChange={(e) => handleSignatoryChange(e.target.value, setCashierBy)}
+                                        placeholder="Select employee or type name"
+                                        disabled={generatingGeneralPayroll}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={styles.adjFormActions}>
+                                <button
+                                    className={styles.adjBtnSecondary}
+                                    onClick={() => setShowGeneralPayrollModal(false)}
+                                    disabled={generatingGeneralPayroll}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className={styles.adjBtnPrimary}
+                                    onClick={handleGenerateGeneralPayroll}
+                                    disabled={generatingGeneralPayroll}
+                                >
+                                    {generatingGeneralPayroll ? "Generating…" : "Generate PDF"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
