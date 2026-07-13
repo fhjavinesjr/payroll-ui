@@ -269,7 +269,7 @@ export default function PayrollComputation() {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-    }, []);
+    }, [employeeMode]);
 
     const stopQueuePolling = useCallback(() => {
         if (queueIntervalRef.current != null) {
@@ -311,8 +311,9 @@ export default function PayrollComputation() {
     const loadResults = useCallback(async (periodKey: string) => {
         setLoadingResults(true);
         try {
+            const group = employeeMode === "contractual" ? "CONTRACTUAL" : "REGULAR";
             const res = await fetchWithAuth(
-                `${API_PAYROLL}/api/payroll-computation/results/${encodeURIComponent(periodKey)}`
+                `${API_PAYROLL}/api/payroll-computation/results/${encodeURIComponent(periodKey)}?payrollGroup=${group}`
             );
             if (!res.ok) throw new Error(`Failed to load results (${res.status})`);
             const data: PayrollDetail[] = await res.json();
@@ -324,7 +325,7 @@ export default function PayrollComputation() {
         } finally {
             setLoadingResults(false);
         }
-    }, []);
+    }, [employeeMode]);
 
     const pollStatus = useCallback(
         (id: string, periodKey: string) => {

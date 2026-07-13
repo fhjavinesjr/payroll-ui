@@ -1436,6 +1436,7 @@ export default function PayrollRegister() {
     const [period, setPeriod] = useState("");
     const [year, setYear] = useState(String(new Date().getFullYear()));
     const [salaryPeriods, setSalaryPeriods] = useState<SalaryPeriodOption[]>([]);
+    const [payrollGroup, setPayrollGroup] = useState<"REGULAR" | "CONTRACTUAL">("REGULAR");
 
     // Register data
     const [rows, setRows] = useState<PayrollDetailRow[]>([]);
@@ -1598,7 +1599,7 @@ export default function PayrollRegister() {
         setShowAllRows(false);
         try {
             const res = await fetchWithAuth(
-                `${API_PAYROLL}/api/payroll-computation/results/${encodeURIComponent(salaryPeriodKey)}`
+                `${API_PAYROLL}/api/payroll-computation/results/${encodeURIComponent(salaryPeriodKey)}?payrollGroup=${payrollGroup}`
             );
             if (!res.ok) {
                 setErrorMsg(`Server returned ${res.status}. No records found for this period.`);
@@ -1636,7 +1637,7 @@ export default function PayrollRegister() {
         } finally {
             setLoading(false);
         }
-    }, [salaryPeriodKey]);
+    }, [salaryPeriodKey, payrollGroup]);
 
     const employeeInputLabel = useCallback((employee: EmployeeOption) => (
         `[${employee.employeeNo}] ${employee.fullName}`
@@ -1710,6 +1711,7 @@ export default function PayrollRegister() {
         try {
             const params = new URLSearchParams({
                 salaryPeriodKey: loadedKey,
+                payrollGroup,
                 currentCompany: "ISOFT HRIS",
                 preparedBy: finalPreparedBy,
                 approvedBy: finalApprovedBy,
@@ -1737,7 +1739,7 @@ export default function PayrollRegister() {
         } finally {
             setGeneratingGeneralPayroll(false);
         }
-    }, [approvedBy, cashierBy, loadedKey, preparedBy, resolveSignatoryEmployeeNo, resolveSignatoryName]);
+    }, [approvedBy, cashierBy, loadedKey, payrollGroup, preparedBy, resolveSignatoryEmployeeNo, resolveSignatoryName]);
 
     // ── Load breakdown ────────────────────────────────────────────────────
 
@@ -1903,6 +1905,33 @@ export default function PayrollRegister() {
                         <p className={styles.subtitle}>
                             Review computed payroll for any salary period — earnings, deductions, and net pay breakdown per employee.
                         </p>
+
+            {/* Payroll Group Selector */}
+            <div className={styles.formSection}>
+                <h2 className={styles.sectionTitle}>Payroll Group</h2>
+                <div className={styles.formRow}>
+                    <label className={styles.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <input
+                            type="radio"
+                            name="payrollGroup"
+                            value="REGULAR"
+                            checked={payrollGroup === "REGULAR"}
+                            onChange={() => { setPayrollGroup("REGULAR"); setRows([]); setLoadedKey(null); }}
+                        />
+                        Regular Employees
+                    </label>
+                    <label className={styles.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <input
+                            type="radio"
+                            name="payrollGroup"
+                            value="CONTRACTUAL"
+                            checked={payrollGroup === "CONTRACTUAL"}
+                            onChange={() => { setPayrollGroup("CONTRACTUAL"); setRows([]); setLoadedKey(null); }}
+                        />
+                        Contractual / COS / Job Order
+                    </label>
+                </div>
+            </div>
 
             {/* Period Selector */}
             <div className={styles.formSection}>
