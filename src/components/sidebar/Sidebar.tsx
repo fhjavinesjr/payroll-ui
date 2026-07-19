@@ -1,14 +1,13 @@
-'use client'
+"use client";
 
 import React from "react";
 import { MenuItem } from "./MenuItem";
 import styles from "@/styles/Sidebar.module.scss";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 import { authLogout } from "@/lib/utils/authLogout";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { localStorageUtil } from "@/lib/utils/localStorageUtil";
-
 
 const menuItems = [
   // {
@@ -73,7 +72,6 @@ const menuItems = [
     goto: "/payroll-management/Reports/Earnings",
     isActive: false,
     permKey: "payroll.reports.earnings",
-    fallbackPermKey: "payroll.register",
   },
   {
     id: 9,
@@ -82,7 +80,6 @@ const menuItems = [
     goto: "/payroll-management/Reports/Deductions",
     isActive: false,
     permKey: "payroll.reports.deductions",
-    fallbackPermKey: "payroll.register",
   },
   {
     id: 10,
@@ -91,7 +88,6 @@ const menuItems = [
     goto: "/payroll-management/Reports/Remittances",
     isActive: false,
     permKey: "payroll.reports.remittances",
-    fallbackPermKey: "payroll.register",
   },
 ];
 
@@ -113,15 +109,18 @@ const otherItems = [
 
 export default function Sidebar() {
   const pathname = usePathname(); // Use usePathname for the current route
-  const router = useRouter();    // Use useRouter for navigation
+  const router = useRouter(); // Use useRouter for navigation
 
-  const visibleMenuItems = menuItems.filter(item =>
-    localStorageUtil.canAccess(item.permKey) ||
-    ("fallbackPermKey" in item && item.fallbackPermKey ? localStorageUtil.canAccess(item.fallbackPermKey) : false)
+  const visibleMenuItems = menuItems.filter((item) =>
+    localStorageUtil.canAccess(item.permKey),
   );
 
   return (
-    <nav className={styles.Sidebar} role="navigation" aria-label="Main navigation">
+    <nav
+      className={styles.Sidebar}
+      role="navigation"
+      aria-label="Main navigation"
+    >
       <div className={styles.brand}>
         <div className={styles.brandIcon}>PUI</div>
         <div className={styles.brandName}>Payroll UI</div>
@@ -131,7 +130,14 @@ export default function Sidebar() {
         <h2 className={styles.menuHeader}></h2>
         <div role="menu">
           {visibleMenuItems.map((item, index) => (
-            <MenuItem key={index} icon={item.icon} label={item.label} goto={item.goto} isActive={pathname === item.goto} onClick={() => {}} />
+            <MenuItem
+              key={index}
+              icon={item.icon}
+              label={item.label}
+              goto={item.goto}
+              isActive={pathname === item.goto}
+              onClick={() => {}}
+            />
           ))}
         </div>
       </div>
@@ -147,7 +153,8 @@ export default function Sidebar() {
               isActive={pathname === item.goto}
               onClick={async () => {
                 if (item.action === "logout") {
-                  const activeJob = sessionStorage.getItem("payroll_active_job");
+                  const activeJob =
+                    sessionStorage.getItem("payroll_active_job");
                   if (activeJob) {
                     const result = await Swal.fire({
                       icon: "warning",
@@ -172,4 +179,4 @@ export default function Sidebar() {
       </div>
     </nav>
   );
-};
+}
