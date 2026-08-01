@@ -8,6 +8,7 @@ import { authLogout } from "@/lib/utils/authLogout";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { localStorageUtil } from "@/lib/utils/localStorageUtil";
+import { runtimeConfig } from "@/lib/utils/runtimeConfig";
 
 const menuItems = [
   // {
@@ -94,13 +95,19 @@ const menuItems = [
 const otherItems = [
   {
     id: 1,
+    icon: "/dashboard.png",
+    label: "Employee Portal",
+    action: "portal",
+  },
+  {
+    id: 2,
     icon: "/help.png",
     label: "Help",
     goto: "/payroll-management",
     isActive: false,
   },
   {
-    id: 2,
+    id: 3,
     icon: "/logout.png",
     label: "Logout",
     action: "logout",
@@ -152,7 +159,23 @@ export default function Sidebar() {
               label={item.label}
               isActive={pathname === item.goto}
               onClick={async () => {
-                if (item.action === "logout") {
+                if (item.action === "portal") {
+                  const activeJob = sessionStorage.getItem("payroll_active_job");
+                  if (activeJob) {
+                    const result = await Swal.fire({
+                      icon: "warning",
+                      title: "Payroll Computation In Progress",
+                      html: "A payroll computation job is currently running.<br/>Opening Employee Portal will stop the live monitoring view, but <strong>the computation will continue on the server</strong>.<br/><br/>Do you want to continue?",
+                      showCancelButton: true,
+                      confirmButtonText: "Open Employee Portal",
+                      cancelButtonText: "Stay",
+                      confirmButtonColor: "#d97706",
+                    });
+                    if (!result.isConfirmed) return;
+                  }
+                  const portalUrl = runtimeConfig.getUiUrl("employee-portal").replace(/\/+$/, "");
+                  window.location.assign(`${portalUrl}/employee-portal/dashboard`);
+                } else if (item.action === "logout") {
                   const activeJob =
                     sessionStorage.getItem("payroll_active_job");
                   if (activeJob) {
