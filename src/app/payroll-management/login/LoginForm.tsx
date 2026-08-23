@@ -16,14 +16,13 @@ import { AUTH_CONFIG } from "@/lib/utils/authConfig";
 import { setCookie } from "@/lib/utils/cookies";
 
 
-const API_BASE_URL = runtimeConfig.getApiUrl("hrm");
-const API_BASE_URL_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
-
 export default function LoginPage() {
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const API_BASE_URL = runtimeConfig.getApiUrl("hrm");
+    const API_BASE_URL_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
 
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
