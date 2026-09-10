@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/start-app.js",
+    "prebuild": "npm run clean",
     "build": "next build && npm run package:prod",
     "package:prod": "node scripts/package-prod.mjs",
     "verify:prod": "node scripts/verify-prod.mjs",
