@@ -9,6 +9,7 @@ import { FaRegEdit, FaTrashAlt } from "react-icons/fa";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
 import { localStorageUtil } from "@/lib/utils/localStorageUtil";
 import { Employee } from "@/lib/types/Employee";
+import { sanitizeNumbers, sanitizeText, sanitizeYear } from "@/lib/utils/inputSanitizers";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -427,7 +428,7 @@ export default function EarningAllowance() {
                                         </option>
                                     ))}
                                 </select>
-                                <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} className={styles.salaryPeriodInput} />
+                                <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(sanitizeNumbers(e.target.value))} className={styles.salaryPeriodInput} />
                             </div>
 
                             {isEffective && (
@@ -446,7 +447,7 @@ export default function EarningAllowance() {
                                                 </option>
                                             ))}
                                         </select>
-                                        <input type="text" placeholder="Year" value={eff_year} onChange={(e) => setEff_year(e.target.value)} className={styles.salaryPeriodInput} />
+                                        <input type="text" placeholder="Year" value={eff_year} onChange={(e) => setEff_year(sanitizeYear(e.target.value))} className={styles.salaryPeriodInput} />
                                     </div>
                                 </>
                             )}
@@ -487,7 +488,7 @@ export default function EarningAllowance() {
                                     <span className={styles.perc}>%</span>
                                 </div>
                                 <label>Reason</label>
-                                <textarea value={reason} className={styles.txtArea} onChange={(e) => setReason(e.target.value)} />
+                                <textarea value={reason} className={styles.txtArea} onChange={(e) => setReason(sanitizeText(e.target.value))} />
                             </>
                         )}
 

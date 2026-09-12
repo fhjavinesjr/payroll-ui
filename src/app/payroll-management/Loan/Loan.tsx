@@ -9,6 +9,7 @@ import { FaRegEdit, FaTrashAlt } from "react-icons/fa";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
 import { localStorageUtil } from "@/lib/utils/localStorageUtil";
 import { Employee } from "@/lib/types/Employee";
+import { sanitizeNumbers, sanitizeReferenceNumber, sanitizeYear } from "@/lib/utils/inputSanitizers";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -452,7 +453,7 @@ export default function Loan() {
                                             </option>
                                         ))}
                                     </select>
-                                    <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} className={styles.salaryPeriodInput} />
+                                    <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(sanitizeYear(e.target.value))} className={styles.salaryPeriodInput} />
                                 </div>
                             </div>
 
@@ -486,7 +487,7 @@ export default function Loan() {
                                                     value={row.reference}
                                                     onChange={(e) => {
                                                         const updated = [...loanRows];
-                                                        updated[idx] = { ...row, reference: e.target.value };
+                                                        updated[idx] = { ...row, reference: sanitizeReferenceNumber(e.target.value) };
                                                         setLoanRows(updated);
                                                     }}
                                                 />
@@ -498,7 +499,7 @@ export default function Loan() {
                                                     value={row.amount}
                                                     onChange={(e) => {
                                                         const updated = [...loanRows];
-                                                        updated[idx] = { ...row, amount: formatWithCommas(e.target.value) };
+                                                        updated[idx] = { ...row, amount: formatWithCommas(sanitizeNumbers(e.target.value)) };
                                                         setLoanRows(updated);
                                                     }}
                                                 />

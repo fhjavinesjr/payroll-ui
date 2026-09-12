@@ -9,6 +9,7 @@ import { FaRegEdit, FaTrashAlt } from "react-icons/fa";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
 import { localStorageUtil } from "@/lib/utils/localStorageUtil";
 import { Employee } from "@/lib/types/Employee";
+import { sanitizeNumbers, sanitizeYear } from "@/lib/utils/inputSanitizers";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -404,7 +405,7 @@ export default function Deduction() {
                                         </option>
                                     ))}
                                 </select>
-                                <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} className={styles.salaryPeriodInput} />
+                                <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(sanitizeYear(e.target.value))} className={styles.salaryPeriodInput} />
                             </div>
 
                             <div className={styles.employeeFields}>
@@ -427,7 +428,7 @@ export default function Deduction() {
                             <input
                                 type="text"
                                 value={referenceNo}
-                                onChange={(e) => setReferenceNo(e.target.value)}
+                                onChange={(e) => setReferenceNo(sanitizeNumbers(e.target.value))}
                                 className={styles.salaryPeriodInput}
                             />
 
@@ -436,7 +437,7 @@ export default function Deduction() {
                                 type="text"
                                 inputMode="decimal"
                                 value={amount}
-                                onChange={(e) => setAmount(formatWithCommas(e.target.value))}
+                                onChange={(e) => setAmount(formatWithCommas(sanitizeNumbers(e.target.value)))}
                                 className={styles.amountFields}
                             />
                         </div>
