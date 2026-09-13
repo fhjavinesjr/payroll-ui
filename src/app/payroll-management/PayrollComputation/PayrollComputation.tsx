@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import styles from "@/styles/PayrollComputation.module.scss";
 import modalStyles from "@/styles/Modal.module.scss";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
+import { sanitizeYear } from "@/lib/utils/inputSanitizers";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -869,7 +870,7 @@ export default function PayrollComputation() {
                         type="text"
                         placeholder="Year (e.g. 2026)"
                         value={year}
-                        onChange={e => setYear(e.target.value)}
+                        onChange={e => setYear(sanitizeYear(e.target.value))}
                         className={styles.salaryPeriodYear}
                         disabled={phase === "running"}
                     />
