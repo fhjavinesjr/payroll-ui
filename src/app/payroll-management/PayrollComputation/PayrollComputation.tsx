@@ -7,6 +7,7 @@ import styles from "@/styles/PayrollComputation.module.scss";
 import modalStyles from "@/styles/Modal.module.scss";
 import { fetchWithAuth } from "@/lib/utils/fetchWithAuth";
 import { sanitizeYear } from "@/lib/utils/inputSanitizers";
+import { resolveSalaryPeriodDate } from "@/lib/utils/salaryPeriodDate";
 
 const API_PAYROLL = runtimeConfig.getApiUrl("payroll");
 const API_ADMINISTRATIVE = runtimeConfig.getApiUrl("administrative");
@@ -125,19 +126,6 @@ function periodLabel(p: SalaryPeriodOption): string {
         release = ` · Release: Day ${p.salaryReleaseStartDay} (${monthOffsetLabel(p.salaryReleaseMonthOffset ?? 0)})`;
     }
     return `${formatSalaryType(p.salaryType)} – ${ordinal(p.nthOrder)} Period · Cutoff: ${start} – ${end}${release}`;
-}
-
-function computeDate(
-    year: number,
-    monthIdx: number,
-    day: number,
-    monthOffset: number
-): string {
-    const d = new Date(year, monthIdx - 1 + monthOffset, day);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${dd}`;
 }
 
 function formatMoney(n: number | null | undefined) {
@@ -493,19 +481,19 @@ export default function PayrollComputation() {
     const derivedDates =
         selectedPeriod && monthIdx > 0
             ? {
-                  cutoffStartDate: computeDate(
+                  cutoffStartDate: resolveSalaryPeriodDate(
                       yearNum,
                       monthIdx,
                       selectedPeriod.cutoffStartDay,
                       selectedPeriod.cutoffStartMonthOffset
                   ),
-                  cutoffEndDate: computeDate(
+                  cutoffEndDate: resolveSalaryPeriodDate(
                       yearNum,
                       monthIdx,
                       selectedPeriod.cutoffEndDay,
                       selectedPeriod.cutoffEndMonthOffset
                   ),
-                  salaryDate: computeDate(
+                  salaryDate: resolveSalaryPeriodDate(
                       yearNum,
                       monthIdx,
                       selectedPeriod.salaryReleaseStartDay ?? selectedPeriod.cutoffEndDay,

@@ -68,6 +68,14 @@ const menuItems = [
   },
   {
     id: 8,
+    icon: "/icons/annualization.svg",
+    label: "Annualization",
+    goto: "/payroll-management/Annualization",
+    isActive: false,
+    permKey: "payroll.annualization",
+  },
+  {
+    id: 9,
     icon: "/icons/report-earnings.svg",
     label: "Reports - Earnings",
     goto: "/payroll-management/Reports/Earnings",
@@ -75,7 +83,7 @@ const menuItems = [
     permKey: "payroll.reports.earnings",
   },
   {
-    id: 9,
+    id: 10,
     icon: "/icons/report-deductions.svg",
     label: "Reports - Deductions",
     goto: "/payroll-management/Reports/Deductions",
@@ -83,7 +91,7 @@ const menuItems = [
     permKey: "payroll.reports.deductions",
   },
   {
-    id: 10,
+    id: 11,
     icon: "/icons/report-remittances.svg",
     label: "Reports - Remittances",
     goto: "/payroll-management/Reports/Remittances",

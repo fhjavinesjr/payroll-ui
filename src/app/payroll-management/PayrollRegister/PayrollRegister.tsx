@@ -63,6 +63,7 @@ type AdjustmentLineDTO = {
     name: string;
     amount: number;
     isTaxable?: boolean;
+    bir2316ItemNo?: string | null;
     isAutoComputed?: boolean;
 };
 
@@ -107,6 +108,7 @@ type PayrollDetailEarning = {
     earningCode: string;
     amount: number;
     isTaxable: boolean;
+    bir2316ItemNo?: string | null;
     indexNo: number;
 };
 
@@ -211,6 +213,7 @@ type EarningTypeDef = {
     accountingCode: string | null;
     name: string;
     taxable: boolean | null;
+    bir2316ItemNo: string | null;
 };
 
 type DeductionTypeDef = {
@@ -226,6 +229,7 @@ type AdditionalAdjLine = {
     name: string;
     amount: string;
     isTaxable: boolean;
+    bir2316ItemNo: string | null;
 };
 
 type AdjustmentModalProps = {
@@ -305,13 +309,13 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
                             if (bdEarningCodes.has(line.code)) {
                                 eAdj[line.code] = String(line.amount);
                             } else {
-                                addl.push({ key: `ex-${line.code}`, lineType: "EARNING", code: line.code, name: line.name, amount: String(line.amount), isTaxable: line.isTaxable ?? false });
+                                addl.push({ key: `ex-${line.code}`, lineType: "EARNING", code: line.code, name: line.name, amount: String(line.amount), isTaxable: line.isTaxable ?? false, bir2316ItemNo: line.bir2316ItemNo ?? null });
                             }
                         } else {
                             if (bdDeductionCodes.has(line.code)) {
                                 dAdj[line.code] = String(line.amount);
                             } else {
-                                addl.push({ key: `ex-${line.code}`, lineType: "DEDUCTION", code: line.code, name: line.name, amount: String(line.amount), isTaxable: false });
+                                addl.push({ key: `ex-${line.code}`, lineType: "DEDUCTION", code: line.code, name: line.name, amount: String(line.amount), isTaxable: false, bir2316ItemNo: null });
                             }
                         }
                     }
@@ -424,7 +428,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
         const code = et.accountingCode?.trim() || et.name.toUpperCase().replace(/\s+/g, "_");
         setAdditionalLines((prev) => [
             ...prev,
-            { key: `ne-${Date.now()}`, lineType: "EARNING", code, name: et.name, amount: String(amt), isTaxable: et.taxable ?? false },
+            { key: `ne-${Date.now()}`, lineType: "EARNING", code, name: et.name, amount: String(amt), isTaxable: et.taxable ?? false, bir2316ItemNo: et.bir2316ItemNo },
         ]);
         setNewEarningTypeId("");
         setNewEarningAmount("");
@@ -440,7 +444,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
         const code = dt.accountingCode?.trim() || dt.name.toUpperCase().replace(/\s+/g, "_");
         setAdditionalLines((prev) => [
             ...prev,
-            { key: `nd-${Date.now()}`, lineType: "DEDUCTION", code, name: dt.name, amount: String(amt), isTaxable: false },
+            { key: `nd-${Date.now()}`, lineType: "DEDUCTION", code, name: dt.name, amount: String(amt), isTaxable: false, bir2316ItemNo: null },
         ]);
         setNewDeductionTypeId("");
         setNewDeductionAmount("");
@@ -463,7 +467,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
             for (const e of breakdown.earnings) {
                 const adj = parseAdj(earningAdj[e.earningCode] ?? "0");
                 if (adj !== 0) {
-                    lines.push({ type: "EARNING", code: e.earningCode, name: `${e.earningName} — Adjustment`, amount: adj, isTaxable: e.isTaxable, isAutoComputed: false });
+                    lines.push({ type: "EARNING", code: e.earningCode, name: `${e.earningName} — Adjustment`, amount: adj, isTaxable: e.isTaxable, bir2316ItemNo: e.bir2316ItemNo, isAutoComputed: false });
                 }
             }
             for (const d of breakdown.deductions) {
@@ -477,7 +481,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
         for (const l of additionalLines) {
             const adj = parseAdj(l.amount);
             if (adj !== 0) {
-                lines.push({ type: l.lineType, code: l.code, name: l.name, amount: adj, isTaxable: l.isTaxable, isAutoComputed: false });
+                lines.push({ type: l.lineType, code: l.code, name: l.name, amount: adj, isTaxable: l.isTaxable, bir2316ItemNo: l.bir2316ItemNo, isAutoComputed: false });
             }
         }
 
@@ -619,6 +623,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
                                                         {e.isTaxable
                                                             ? <span className={styles.adjTaxableTag}>Taxable</span>
                                                             : <span className={styles.adjNonTaxableTag}>Non-Tax</span>}
+                                                        <small> {e.bir2316ItemNo ? `BIR ${e.bir2316ItemNo}` : "BIR unclassified"}</small>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -643,6 +648,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
                                                         <td>
                                                             <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
                                                                 {l.isTaxable ? <span className={styles.adjTaxableTag}>Taxable</span> : <span className={styles.adjNonTaxableTag}>Non-Tax</span>}
+                                                                <small>{l.bir2316ItemNo ? `BIR ${l.bir2316ItemNo}` : "BIR unclassified"}</small>
                                                                 <button className={styles.adjBtnDanger} onClick={() => handleRemoveAdditionalLine(l.key)}>✕</button>
                                                             </div>
                                                         </td>
@@ -659,7 +665,7 @@ function AdjustmentModal({ row, periodKey, salaryType, existingAdj, currentUser,
                                             <option value="">— Select earning type —</option>
                                             {earningTypes.map((et) => (
                                                 <option key={et.earningTypeId} value={String(et.earningTypeId)}>
-                                                    {et.name}{et.taxable ? " ★" : ""}
+                                                    {et.name}{et.taxable ? " ★" : ""}{et.bir2316ItemNo ? ` · BIR ${et.bir2316ItemNo}` : " · Unclassified"}
                                                 </option>
                                             ))}
                                         </select>
