@@ -1,0 +1,35 @@
+.backdrop { position: fixed; inset: 0; z-index: 1100; background: rgba(18, 29, 53, .65); display: grid; place-items: center; padding: 16px; }
+.modal { width: min(100%, 980px); max-height: 92vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 18px 55px rgba(0, 0, 0, .3); color: #24344d; }
+.header, .footer { padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #dce3ee; }
+.header h2 { margin: 0; font-size: 20px; }
+.header p { margin: 3px 0 0; color: #667791; font-size: 13px; }
+.header button { border: 0; background: transparent; font-size: 24px; cursor: pointer; color: #60718b; }
+.footer { border-top: 1px solid #dce3ee; border-bottom: 0; }
+.footer button, .actions button, .tableWrap button { border: 1px solid #b8c7dd; border-radius: 6px; background: #fff; padding: 7px 12px; color: #304264; cursor: pointer; }
+.body { padding: 18px 22px; overflow: auto; }
+.note { margin: 0 0 16px; line-height: 1.5; }
+.totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.totals div { border: 1px solid #dce3ee; border-radius: 7px; padding: 11px; display: flex; flex-direction: column; gap: 5px; }
+.totals span { color: #64748b; font-size: 12px; }
+.totals strong { font-size: 16px; }
+.warning, .error, .ok { padding: 10px 12px; border-radius: 6px; margin: 16px 0 8px; }
+.warning { background: #fff8e8; color: #85520a; }
+.error { background: #fff0f0; color: #a92323; }
+.ok { background: #edf9f0; color: #226837; }
+.issues { max-height: 130px; overflow: auto; margin: 0 0 15px; padding-left: 22px; font-size: 13px; }
+.tableWrap { overflow-x: auto; }
+.tableWrap table { width: 100%; border-collapse: collapse; min-width: 650px; }
+.tableWrap th, .tableWrap td { text-align: left; padding: 9px; border-bottom: 1px solid #e3e9f2; font-size: 13px; }
+.tableWrap th { background: #edf2f8; }
+.editor { margin-top: 18px; padding: 16px; border: 1px solid #ccd7e7; border-radius: 8px; }
+.editor h3 { margin: 0 0 14px; font-size: 16px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.fields label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; }
+.fields input, .fields textarea, .fields select { width: 100%; box-sizing: border-box; border: 1px solid #bdc9d9; border-radius: 5px; padding: 8px; font: inherit; }
+.fields textarea { min-height: 60px; }
+.wide { grid-column: 1 / -1; }
+.actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.actions .primary { background: #565bd3; color: white; border-color: #565bd3; }
+.actions .danger { color: #9a3412; border-color: #fdba74; }
+.actions button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 640px) { .totals, .fields { grid-template-columns: 1fr; } .wide { grid-column: auto; } }
